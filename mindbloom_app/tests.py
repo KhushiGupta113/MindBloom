@@ -156,3 +156,85 @@ class MindBloomCoreTests(TestCase):
         resp_eleanor = self.client.get(reverse('switch_profile', args=['eleanor']))
         self.assertEqual(resp_eleanor.status_code, 302)
         self.assertIn('/', resp_eleanor.url)
+
+    def test_login_and_register_all_9_ner_languages(self):
+        """Verify login and register pages render in all 9 supported NER languages"""
+        from .translations import SUPPORTED_LANGUAGES, get_text
+        for code, label, _ in SUPPORTED_LANGUAGES:
+            # Set language
+            self.client.get(reverse('set_language') + f"?lang={code}&next=/login/")
+            
+            # Login page
+            login_resp = self.client.get(reverse('login'))
+            self.assertEqual(login_resp.status_code, 200)
+            expected_login_title = get_text('login_title', code)
+            self.assertContains(login_resp, expected_login_title)
+
+            # Register page
+            reg_resp = self.client.get(reverse('register'))
+            self.assertEqual(reg_resp.status_code, 200)
+            expected_reg_title = get_text('register_title', code)
+            self.assertContains(reg_resp, expected_reg_title)
+
+    def test_demo_accounts_login_with_credentials(self):
+        """Verify Eleanor and Sarah can log in with username and password 'mindbloom123'"""
+        # Eleanor login
+        resp_e = self.client.post(reverse('login'), {
+            'username': 'eleanor',
+            'password': 'mindbloom123'
+        })
+        self.assertEqual(resp_e.status_code, 302)
+        self.assertEqual(resp_e.url, '/')
+
+        # Sarah login
+        self.client.get(reverse('logout'))
+        resp_s = self.client.post(reverse('login'), {
+            'username': 'sarah',
+            'password': 'mindbloom123'
+        })
+        self.assertEqual(resp_s.status_code, 302)
+        self.assertIn('caregiver', resp_s.url)
+
+    def test_quick_demo_sign_in_buttons(self):
+        """Verify 1-click quick demo buttons for Eleanor and Sarah"""
+        # Eleanor quick sign in
+        resp_e = self.client.post(reverse('login'), {'demo_user': 'eleanor'})
+        self.assertEqual(resp_e.status_code, 302)
+        self.assertEqual(resp_e.url, '/')
+
+        # Sarah quick sign in
+        resp_s = self.client.post(reverse('login'), {'demo_user': 'sarah'})
+        self.assertEqual(resp_s.status_code, 302)
+        self.assertIn('caregiver', resp_s.url)
+
+    def test_user_registration_flow(self):
+        """Verify new registration for both elderly and caregiver roles"""
+        # Register new elderly user in Mizo
+        resp_reg = self.client.post(reverse('register'), {
+            'full_name': 'Lalthan Pari',
+            'username': 'lalthan',
+            'role': 'elderly',
+            'preferred_language': 'miz',
+            'password': 'safePassword123',
+            'confirm_password': 'safePassword123'
+        })
+        self.assertEqual(resp_reg.status_code, 302)
+        self.assertEqual(resp_reg.url, '/')
+        self.assertEqual(self.client.session.get('language'), 'miz')
+
+        new_user = User.objects.get(username='lalthan')
+        self.assertEqual(new_user.profile.role, 'elderly')
+        self.assertEqual(new_user.profile.preferred_language, 'miz')
+
+        # Register new caregiver user in Kokborok
+        resp_care = self.client.post(reverse('register'), {
+            'full_name': 'Debbarma Caregiver',
+            'username': 'debbarma',
+            'role': 'caregiver',
+            'preferred_language': 'kok',
+            'password': 'safePassword123',
+            'confirm_password': 'safePassword123'
+        })
+        self.assertEqual(resp_care.status_code, 302)
+        self.assertIn('caregiver', resp_care.url)
+        self.assertEqual(self.client.session.get('language'), 'kok')

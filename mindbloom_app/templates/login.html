@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ T.login_title }} — MindBloom{% endblock %}
+
+{% block content %}
+<main class="min-h-[calc(100vh-140px)] flex items-center justify-center py-10 px-4 sm:px-6">
+  <div class="w-full max-w-lg bg-surface-container-lowest rounded-3xl border border-outline-variant/60 shadow-lg p-6 sm:p-10 space-y-8">
+    
+    <!-- Header -->
+    <div class="text-center space-y-2">
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-secondary-fixed text-primary mb-2 shadow-sm">
+        <span class="material-symbols-outlined text-3xl">spa</span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-serif font-bold text-on-surface tracking-tight">{{ T.login_title }}</h1>
+      <p class="text-sm sm:text-base text-on-surface-variant font-medium leading-relaxed">{{ T.login_subtitle }}</p>
+    </div>
+
+    <!-- Error Alert if any -->
+    {% if error %}
+    <div class="p-4 rounded-2xl bg-error-container/50 border border-error/30 text-error flex items-start gap-3 animate-fade-in" role="alert">
+      <span class="material-symbols-outlined text-xl flex-shrink-0 mt-0.5">error</span>
+      <p class="text-sm font-semibold">{{ error }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Standard Login Form -->
+    <form method="POST" action="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="space-y-5">
+      {% csrf_token %}
+      
+      <!-- Username Field -->
+      <div class="space-y-1.5">
+        <label for="username" class="block text-sm font-semibold text-on-surface">
+          {{ T.username_label }}
+        </label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">person</span>
+          <input type="text" id="username" name="username" required
+                 value="{{ username|default:'' }}"
+                 placeholder="{{ T.username_placeholder }}"
+                 class="w-full h-12 pl-11 pr-4 rounded-xl bg-surface-container-low border border-outline-variant text-on-surface text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="space-y-1.5">
+        <label for="password" class="block text-sm font-semibold text-on-surface">
+          {{ T.password_label }}
+        </label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">lock</span>
+          <input type="password" id="password" name="password" required
+                 placeholder="{{ T.password_placeholder }}"
+                 class="w-full h-12 pl-11 pr-4 rounded-xl bg-surface-container-low border border-outline-variant text-on-surface text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="w-full h-12 py-3 rounded-2xl bg-primary hover:bg-primary-container text-on-primary text-base font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+        <span class="material-symbols-outlined text-xl">login</span>
+        <span>{{ T.sign_in_btn }}</span>
+      </button>
+    </form>
+
+    <!-- Divider -->
+    <div class="relative flex items-center justify-center">
+      <div class="border-t border-outline-variant w-full"></div>
+      <span class="bg-surface-container-lowest px-3 text-xs uppercase tracking-wider text-on-surface-variant font-bold">{{ T.quick_demo_sign_in }}</span>
+      <div class="border-t border-outline-variant w-full"></div>
+    </div>
+
+    <!-- Quick Demo Accounts -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <!-- Eleanor Demo Button -->
+      <form method="POST" action="{% url 'login' %}">
+        {% csrf_token %}
+        <input type="hidden" name="demo_user" value="eleanor">
+        <button type="submit" class="w-full p-3.5 rounded-2xl border-2 border-primary/30 hover:border-primary bg-surface-container-low hover:bg-secondary-fixed/40 transition-all text-left flex items-center gap-3 group cursor-pointer">
+          <img class="w-11 h-11 rounded-full object-cover border border-primary/20 flex-shrink-0" src="{% static 'images/stitch/img_a3312d477143.jpg' %}" alt="Eleanor Vance">
+          <div class="overflow-hidden">
+            <span class="inline-block text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full mb-0.5">{{ T.role_elderly_badge }}</span>
+            <div class="text-sm font-bold text-on-surface truncate">Eleanor Vance</div>
+            <div class="text-xs text-on-surface-variant truncate">{{ T.demo_eleanor_btn }}</div>
+          </div>
+        </button>
+      </form>
+
+      <!-- Sarah Demo Button -->
+      <form method="POST" action="{% url 'login' %}">
+        {% csrf_token %}
+        <input type="hidden" name="demo_user" value="sarah">
+        <button type="submit" class="w-full p-3.5 rounded-2xl border-2 border-primary/30 hover:border-primary bg-surface-container-low hover:bg-secondary-fixed/40 transition-all text-left flex items-center gap-3 group cursor-pointer">
+          <img class="w-11 h-11 rounded-full object-cover border border-primary/20 flex-shrink-0" src="{% static 'images/stitch/img_570dff029353.jpg' %}" alt="Sarah Vance">
+          <div class="overflow-hidden">
+            <span class="inline-block text-xs font-bold text-tertiary bg-tertiary-fixed px-2 py-0.5 rounded-full mb-0.5">{{ T.role_caregiver_badge }}</span>
+            <div class="text-sm font-bold text-on-surface truncate">Sarah Vance</div>
+            <div class="text-xs text-on-surface-variant truncate">{{ T.demo_sarah_btn }}</div>
+          </div>
+        </button>
+      </form>
+    </div>
+
+    <!-- Switch to Register -->
+    <div class="text-center pt-2 border-t border-outline-variant/60">
+      <p class="text-sm text-on-surface-variant">
+        {{ T.dont_have_account }}
+        <a href="{% url 'register' %}" class="font-bold text-primary hover:underline ml-1 inline-flex items-center gap-0.5">
+          <span>{{ T.create_account_btn }}</span>
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </a>
+      </p>
+    </div>
+
+  </div>
+</main>
+{% endblock %}

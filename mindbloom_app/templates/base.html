@@ -233,7 +233,6 @@
           
           <div id="languageDropdownMenu" class="hidden absolute right-0 mt-2 w-64 rounded-xl bg-surface-container-lowest border border-outline-variant calm-dialogue-elevation p-2 z-50 shadow-xl">
             <div class="px-3 py-2 border-b border-outline-variant text-xs text-on-surface-variant font-semibold">
-              {{ T.language_label }}: North East & English
               {{ T.language_label }}: {{ T.lang_selector_title|default:"North East & English" }}
             </div>
             <div class="py-1 max-h-64 overflow-y-auto space-y-1">
@@ -268,26 +267,55 @@
           <span>{{ T.need_hand }}</span>
         </button>
 
-        <!-- User / Caregiver Profile Switcher -->
-        <div class="relative inline-block ml-0.5">
-          {% if CURRENT_PROFILE.role == 'caregiver' %}
-            <a href="{% url 'switch_profile' 'eleanor' %}" 
-               title="Sarah (Caregiver) • Click to switch to Eleanor"
-               class="flex items-center gap-1 p-0.5 rounded-full border-2 border-primary hover:scale-105 transition-all">
-              <img class="w-8 h-8 rounded-full object-cover" 
-                   src="{% static 'images/stitch/img_570dff029353.jpg' %}" 
-                   alt="Caregiver Sarah">
-            </a>
-          {% else %}
-            <a href="{% url 'switch_profile' 'sarah' %}" 
-               title="Eleanor • Click to switch to Sarah"
-               class="flex items-center gap-1 p-0.5 rounded-full border-2 border-surface-container-high hover:border-primary hover:scale-105 transition-all">
-              <img class="w-8 h-8 rounded-full object-cover" 
-                   src="{% static 'images/stitch/img_a3312d477143.jpg' %}" 
-                   alt="Eleanor">
-            </a>
-          {% endif %}
-        </div>
+        <!-- Authentication / Profile & Controls -->
+        {% if request.user.is_authenticated and CURRENT_PROFILE %}
+          <!-- Role Badge -->
+          <span class="hidden lg:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold {% if CURRENT_PROFILE.role == 'caregiver' %}bg-tertiary-fixed text-tertiary{% else %}bg-secondary-fixed text-primary{% endif %}">
+            <span class="material-symbols-outlined text-xs">{% if CURRENT_PROFILE.role == 'caregiver' %}volunteer_activism{% else %}elderly{% endif %}</span>
+            <span>{% if CURRENT_PROFILE.role == 'caregiver' %}{{ T.role_caregiver_badge }}{% else %}{{ T.role_elderly_badge }}{% endif %}</span>
+          </span>
+
+          <!-- Profile Switcher Avatar -->
+          <div class="relative inline-block ml-0.5">
+            {% if CURRENT_PROFILE.role == 'caregiver' %}
+              <a href="{% url 'switch_profile' 'eleanor' %}" 
+                 title="{{ T.portal_switch_prompt }}: Eleanor"
+                 class="flex items-center gap-1 p-0.5 rounded-full border-2 border-primary hover:scale-105 transition-all">
+                <img class="w-8 h-8 rounded-full object-cover" 
+                     src="{% static 'images/stitch/img_570dff029353.jpg' %}" 
+                     alt="Sarah Vance">
+              </a>
+            {% else %}
+              <a href="{% url 'switch_profile' 'sarah' %}" 
+                 title="{{ T.portal_switch_prompt }}: Sarah"
+                 class="flex items-center gap-1 p-0.5 rounded-full border-2 border-surface-container-high hover:border-primary hover:scale-105 transition-all">
+                <img class="w-8 h-8 rounded-full object-cover" 
+                     src="{% static 'images/stitch/img_a3312d477143.jpg' %}" 
+                     alt="Eleanor Vance">
+              </a>
+            {% endif %}
+          </div>
+
+          <!-- Sign Out Button -->
+          <a href="{% url 'logout' %}" 
+             title="{{ T.sign_out_btn }}"
+             class="h-9 px-2 sm:px-2.5 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-error transition-colors flex items-center gap-1 border border-outline-variant text-xs font-semibold">
+            <span class="material-symbols-outlined text-base">logout</span>
+            <span class="hidden xl:inline">{{ T.sign_out_btn }}</span>
+          </a>
+        {% else %}
+          <!-- Guest / Sign In & Register Buttons -->
+          <a href="{% url 'login' %}" 
+             class="h-9 px-3 rounded-full bg-surface-container-low hover:bg-surface-container text-primary border border-outline-variant text-xs sm:text-sm font-semibold flex items-center gap-1 transition-colors">
+            <span class="material-symbols-outlined text-base">login</span>
+            <span>{{ T.sign_in_btn }}</span>
+          </a>
+          <a href="{% url 'register' %}" 
+             class="h-9 px-3 rounded-full bg-primary hover:bg-primary-container text-on-primary text-xs sm:text-sm font-semibold flex items-center gap-1 shadow-sm transition-colors">
+            <span class="material-symbols-outlined text-base">person_add</span>
+            <span class="hidden sm:inline">{{ T.create_account_btn }}</span>
+          </a>
+        {% endif %}
 
       </div>
     </div>

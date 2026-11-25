@@ -148,9 +148,25 @@ Open your browser at:
 
 ---
 
-## 👤 Sample Demonstration Accounts
+## 🔐 Role-Based Authentication & Registration Portal
 
-- **Eleanor Vance (Elderly Patient)**: `username: eleanor`, `password: mindbloom123`
-- **Sarah Vance (Caregiver)**: `username: sarah`, `password: mindbloom123`
+MindBloom provides dedicated role-based authentication and registration with full localization across all 9 NER languages:
+- **Sign In Page:** `/login/`
+- **Registration Page:** `/register/`
+- **Sign Out:** `/logout/`
 
-You can switch between Eleanor's view and Sarah's caregiver view at any time by clicking the profile avatar in the top right corner of the header.
+### 👤 Sample Demonstration Accounts
+- **Eleanor Vance (Elderly Patient / User):**
+  - **Username:** `eleanor`
+  - **Password:** `mindbloom123`
+  - **Destination:** Redirects directly to the **Home Sanctuary** (`/`).
+- **Sarah Vance (Caregiver / Family Member):**
+  - **Username:** `sarah`
+  - **Password:** `mindbloom123`
+  - **Destination:** Redirects directly to the **Family Circle & Caregiver Support Dashboard** (`/caregiver/`).
+
+### ⚡ Quick Demo Sign-In
+On the `/login/` screen, 1-click **Quick Demo Sign-In** cards allow immediate switching and evaluation without typing credentials. You can also switch roles on any screen at any time using the companion avatar in the top right header.
+
+### 📝 User Registration
+New elderly users and caregivers can register at `/register/`, choosing their role, full name, preferred regional NER language, username, and password. Upon registration, their role-appropriate dashboard and regional language are automatically initialized.

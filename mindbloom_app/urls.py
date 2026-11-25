@@ -24,4 +24,9 @@ urlpatterns = [
     path('api/toggle-reminder/<int:reminder_id>/', views.toggle_reminder_api, name='toggle_reminder_api'),
     path('api/set-language/', views.set_language_api, name='set_language'),
     path('switch-profile/<str:role>/', views.switch_profile_view, name='switch_profile'),
+
+    # Authentication & Role-Based Portal
+    path('login/', views.login_view, name='login'),
+    path('register/', views.register_view, name='register'),
+    path('logout/', views.logout_view, name='logout'),
 ]

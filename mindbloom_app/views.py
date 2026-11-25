@@ -4,7 +4,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
-from django.contrib.auth import login
+from django.contrib.auth import login, logout, authenticate
 from django.utils import timezone
 from .models import UserProfile, GameSession, Memory, Reminder, CaregiverLog
 from .translations import SUPPORTED_LANGUAGES, get_text
@@ -72,9 +72,12 @@ def localize_game_sessions(sessions, lang):
             key = game_map.get(s.game_type)
             s.display_title = get_text(key, lang) if key else s.game_title
 
-def get_or_create_default_user():
-    """Ensure Eleanor exists as default companion user for ease of evaluation"""
+def ensure_demo_users():
+    """Ensure Eleanor (elderly patient) and Sarah (caregiver) exist with demo credentials (mindbloom123)."""
     eleanor, _ = User.objects.get_or_create(username="eleanor", defaults={"first_name": "Eleanor", "last_name": "Vance"})
+    if not eleanor.has_usable_password() or not eleanor.check_password("mindbloom123"):
+        eleanor.set_password("mindbloom123")
+        eleanor.save()
     if not hasattr(eleanor, 'profile'):
         UserProfile.objects.create(
             user=eleanor,
@@ -84,6 +87,25 @@ def get_or_create_default_user():
             caregiver_name="Sarah Vance (Daughter)",
             avatar_url="/static/images/stitch/img_a3312d477143.jpg"
         )
+
+    sarah, _ = User.objects.get_or_create(username="sarah", defaults={"first_name": "Sarah", "last_name": "Vance"})
+    if not sarah.has_usable_password() or not sarah.check_password("mindbloom123"):
+        sarah.set_password("mindbloom123")
+        sarah.save()
+    if not hasattr(sarah, 'profile'):
+        UserProfile.objects.create(
+            user=sarah,
+            role="caregiver",
+            preferred_language="en",
+            companion_name="Eleanor Vance",
+            caregiver_name="Sarah Vance (Daughter)",
+            avatar_url="/static/images/stitch/img_570dff029353.jpg"
+        )
+    return eleanor, sarah
+
+def get_or_create_default_user():
+    """Ensure Eleanor exists as default companion user for ease of evaluation"""
+    eleanor, _ = ensure_demo_users()
     return eleanor
 
 def get_active_user(request):
@@ -314,11 +336,102 @@ def set_language_api(request):
     return redirect(next_url)
 
 def switch_profile_view(request, role):
+    eleanor, sarah = ensure_demo_users()
     if role == 'sarah':
-        sarah, _ = User.objects.get_or_create(username="sarah", defaults={"first_name": "Sarah", "last_name": "Vance"})
         login(request, sarah)
+        if hasattr(sarah, 'profile'):
+            request.session['language'] = sarah.profile.preferred_language
         return redirect('caregiver')
     else:
-        eleanor, _ = User.objects.get_or_create(username="eleanor", defaults={"first_name": "Eleanor", "last_name": "Vance"})
         login(request, eleanor)
+        if hasattr(eleanor, 'profile'):
+            request.session['language'] = eleanor.profile.preferred_language
         return redirect('home')
+
+def login_view(request):
+    lang = get_current_lang(request)
+    error = None
+
+    if request.user.is_authenticated and request.method == 'GET':
+        if hasattr(request.user, 'profile') and request.user.profile.role == 'caregiver':
+            return redirect('caregiver')
+        return redirect('home')
+
+    if request.method == 'POST':
+        demo_user = request.POST.get('demo_user')
+        if demo_user:
+            eleanor, sarah = ensure_demo_users()
+            target_user = sarah if demo_user == 'sarah' else eleanor
+            login(request, target_user)
+            if hasattr(target_user, 'profile'):
+                request.session['language'] = target_user.profile.preferred_language
+            next_url = request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
+            return redirect('caregiver' if demo_user == 'sarah' else 'home')
+
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '').strip()
+
+        ensure_demo_users()
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            if hasattr(user, 'profile'):
+                request.session['language'] = user.profile.preferred_language
+                next_url = request.GET.get('next')
+                if next_url:
+                    return redirect(next_url)
+                if user.profile.role == 'caregiver':
+                    return redirect('caregiver')
+            return redirect(request.GET.get('next') or 'home')
+        else:
+            error = get_text('login_error_invalid', lang)
+
+    return render(request, 'login.html', {'error': error})
+
+def register_view(request):
+    lang = get_current_lang(request)
+    error = None
+
+    if request.user.is_authenticated and request.method == 'GET':
+        if hasattr(request.user, 'profile') and request.user.profile.role == 'caregiver':
+            return redirect('caregiver')
+        return redirect('home')
+
+    if request.method == 'POST':
+        full_name = request.POST.get('full_name', '').strip()
+        username = request.POST.get('username', '').strip()
+        role = request.POST.get('role', 'elderly').strip()
+        preferred_lang = request.POST.get('preferred_language', lang).strip()
+        password = request.POST.get('password', '').strip()
+        confirm_password = request.POST.get('confirm_password', '').strip()
+
+        if not username or not password:
+            error = get_text('login_error_invalid', lang)
+        elif password != confirm_password:
+            error = get_text('register_error_password_match', lang)
+        elif User.objects.filter(username=username).exists():
+            error = get_text('register_error_user_exists', lang)
+        else:
+            user = User.objects.create_user(username=username, password=password, first_name=full_name)
+            avatar = "/static/images/stitch/img_570dff029353.jpg" if role == 'caregiver' else "/static/images/stitch/img_a3312d477143.jpg"
+            UserProfile.objects.create(
+                user=user,
+                role=role,
+                preferred_language=preferred_lang,
+                companion_name=full_name or username,
+                caregiver_name="Family Caregiver" if role == 'elderly' else full_name,
+                avatar_url=avatar
+            )
+            login(request, user)
+            request.session['language'] = preferred_lang
+            if role == 'caregiver':
+                return redirect('caregiver')
+            return redirect('home')
+
+    return render(request, 'register.html', {'error': error})
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')

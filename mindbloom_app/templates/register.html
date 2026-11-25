@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ T.register_title }} — MindBloom{% endblock %}
+
+{% block content %}
+<main class="min-h-[calc(100vh-140px)] flex items-center justify-center py-10 px-4 sm:px-6">
+  <div class="w-full max-w-xl bg-surface-container-lowest rounded-3xl border border-outline-variant/60 shadow-lg p-6 sm:p-10 space-y-8">
+    
+    <!-- Header -->
+    <div class="text-center space-y-2">
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-secondary-fixed text-primary mb-2 shadow-sm">
+        <span class="material-symbols-outlined text-3xl">person_add</span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-serif font-bold text-on-surface tracking-tight">{{ T.register_title }}</h1>
+      <p class="text-sm sm:text-base text-on-surface-variant font-medium leading-relaxed">{{ T.register_subtitle }}</p>
+    </div>
+
+    <!-- Error Alert if any -->
+    {% if error %}
+    <div class="p-4 rounded-2xl bg-error-container/50 border border-error/30 text-error flex items-start gap-3 animate-fade-in" role="alert">
+      <span class="material-symbols-outlined text-xl flex-shrink-0 mt-0.5">error</span>
+      <p class="text-sm font-semibold">{{ error }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Registration Form -->
+    <form method="POST" action="{% url 'register' %}" class="space-y-6">
+      {% csrf_token %}
+      
+      <!-- Role Selection Cards -->
+      <div class="space-y-2">
+        <label class="block text-sm font-bold text-on-surface">{{ T.select_role_label }}</label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="roleSelectorGroup">
+          <!-- Elderly Role Card -->
+          <label class="cursor-pointer">
+            <input type="radio" name="role" value="elderly" checked class="peer sr-only">
+            <div class="p-4 rounded-2xl border-2 border-outline-variant/70 peer-checked:border-primary peer-checked:bg-secondary-fixed/30 hover:border-primary/60 transition-all flex flex-col gap-2 h-full">
+              <div class="flex items-center justify-between">
+                <span class="material-symbols-outlined text-2xl text-primary">elderly</span>
+                <span class="material-symbols-outlined text-primary opacity-0 peer-checked:opacity-100 transition-opacity">check_circle</span>
+              </div>
+              <div class="font-bold text-base text-on-surface">{{ T.role_elderly_title }}</div>
+              <p class="text-xs text-on-surface-variant leading-relaxed">{{ T.role_elderly_desc }}</p>
+            </div>
+          </label>
+
+          <!-- Caregiver Role Card -->
+          <label class="cursor-pointer">
+            <input type="radio" name="role" value="caregiver" class="peer sr-only">
+            <div class="p-4 rounded-2xl border-2 border-outline-variant/70 peer-checked:border-primary peer-checked:bg-secondary-fixed/30 hover:border-primary/60 transition-all flex flex-col gap-2 h-full">
+              <div class="flex items-center justify-between">
+                <span class="material-symbols-outlined text-2xl text-tertiary">volunteer_activism</span>
+                <span class="material-symbols-outlined text-primary opacity-0 peer-checked:opacity-100 transition-opacity">check_circle</span>
+              </div>
+              <div class="font-bold text-base text-on-surface">{{ T.role_caregiver_title }}</div>
+              <p class="text-xs text-on-surface-variant leading-relaxed">{{ T.role_caregiver_desc }}</p>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Full Name -->
+      <div class="space-y-1.5">
+        <label for="full_name" class="block text-sm font-semibold text-on-surface">
+          {{ T.full_name_label }}
+        </label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">badge</span>
+          <input type="text" id="full_name" name="full_name" required
+                 placeholder="{{ T.full_name_placeholder }}"
+                 class="w-full h-12 pl-11 pr-4 rounded-xl bg-surface-container-low border border-outline-variant text-on-surface text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+        </div>
+      </div>
+
+      <!-- Username -->
+      <div class="space-y-1.5">
+        <label for="username" class="block text-sm font-semibold text-on-surface">
+          {{ T.username_label }}
+        </label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">person</span>
+          <input type="text" id="username" name="username" required
+                 placeholder="{{ T.username_placeholder }}"
+                 class="w-full h-12 pl-11 pr-4 rounded-xl bg-surface-container-low border border-outline-variant text-on-surface text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+        </div>
+      </div>
+
+      <!-- Preferred Regional Language -->
+      <div class="space-y-1.5">
+        <label for="preferred_language" class="block text-sm font-semibold text-on-surface">
+          {{ T.preferred_language_label }}
+        </label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">language</span>
+          <select id="preferred_language" name="preferred_language"
+                  class="w-full h-12 pl-11 pr-10 rounded-xl bg-surface-container-low border border-outline-variant text-on-surface text-base appearance-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+            {% for code, label, native in SUPPORTED_LANGUAGES %}
+              <option value="{{ code }}" {% if LANG == code %}selected{% endif %}>
+                {{ label }} ({{ native }})
+              </option>
+            {% endfor %}
+          </select>
+          <span class="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">arrow_drop_down</span>
+        </div>
+      </div>
+
+      <!-- Passwords Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Password Field -->
+        <div class="space-y-1.5">
+          <label for="password" class="block text-sm font-semibold text-on-surface">
+            {{ T.password_label }}
+          </label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">lock</span>
+            <input type="password" id="password" name="password" required
+                   placeholder="{{ T.password_placeholder }}"
+                   class="w-full h-12 pl-11 pr-4 rounded-xl bg-surface-container-low border border-outline-variant text-on-surface text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+          </div>
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div class="space-y-1.5">
+          <label for="confirm_password" class="block text-sm font-semibold text-on-surface">
+            {{ T.confirm_password_label }}
+          </label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">verified_user</span>
+            <input type="password" id="confirm_password" name="confirm_password" required
+                   placeholder="{{ T.confirm_password_placeholder }}"
+                   class="w-full h-12 pl-11 pr-4 rounded-xl bg-surface-container-low border border-outline-variant text-on-surface text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="w-full h-12 py-3 rounded-2xl bg-primary hover:bg-primary-container text-on-primary text-base font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+        <span class="material-symbols-outlined text-xl">how_to_reg</span>
+        <span>{{ T.create_account_btn }}</span>
+      </button>
+    </form>
+
+    <!-- Switch to Login -->
+    <div class="text-center pt-2 border-t border-outline-variant/60">
+      <p class="text-sm text-on-surface-variant">
+        {{ T.already_have_account }}
+        <a href="{% url 'login' %}" class="font-bold text-primary hover:underline ml-1 inline-flex items-center gap-0.5">
+          <span>{{ T.sign_in_btn }}</span>
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </a>
+      </p>
+    </div>
+
+  </div>
+</main>
+{% endblock %}
