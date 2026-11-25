@@ -1,0 +1,578 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="light" lang="{{ LANG }}">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>{% block title %}MindBloom — Calm Warmth{% endblock %}</title>
+
+  <!-- Material Symbols Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <!-- Merriweather and Plus Jakarta Sans Typography -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN with plugins -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <!-- Tailwind Configuration from Stitch Design System -->
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary-fixed": "#d6e8cd",
+            "inverse-primary": "#b3cdb6",
+            "tertiary": "#72402c",
+            "on-error": "#ffffff",
+            "primary-container": "#536b58",
+            "on-secondary-fixed": "#111f0e",
+            "on-tertiary-fixed-variant": "#6b3a26",
+            "tertiary-fixed": "#ffdbce",
+            "surface-bright": "#fff9ee",
+            "tertiary-container": "#8e5741",
+            "background": "#fff9ee",
+            "primary-fixed-dim": "#b3cdb6",
+            "primary-fixed": "#cee9d2",
+            "inverse-surface": "#333029",
+            "on-surface-variant": "#434843",
+            "outline-variant": "#c3c8c1",
+            "on-primary": "#ffffff",
+            "secondary": "#53634e",
+            "error": "#ba1a1a",
+            "secondary-fixed-dim": "#baccb2",
+            "on-tertiary-fixed": "#351002",
+            "surface-container-low": "#f9f3e7",
+            "on-tertiary": "#ffffff",
+            "surface-container": "#f4ede2",
+            "on-primary-fixed": "#092011",
+            "on-surface": "#1e1b15",
+            "surface-tint": "#4c6451",
+            "surface-variant": "#e8e2d6",
+            "error-container": "#ffdad6",
+            "on-secondary-fixed-variant": "#3c4b37",
+            "primary": "#3b5341",
+            "outline": "#737972",
+            "surface-container-highest": "#e8e2d6",
+            "on-primary-container": "#cfead3",
+            "surface-dim": "#dfd9ce",
+            "surface-container-lowest": "#ffffff",
+            "on-background": "#1e1b15",
+            "on-primary-fixed-variant": "#354c3b",
+            "tertiary-fixed-dim": "#fdb69b",
+            "on-tertiary-container": "#ffdcd0",
+            "secondary-container": "#d6e8cd",
+            "inverse-on-surface": "#f7f0e4",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#596953",
+            "surface-container-high": "#eee7dc",
+            "on-error-container": "#93000a",
+            "surface": "#fff9ee"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-md": "1.25rem",
+            "space-xs": "0.5rem",
+            "space-sm": "0.75rem",
+            "space-lg": "1.75rem",
+            "gutter-mobile": "1rem",
+            "space-xl": "2.5rem",
+            "margin-mobile": "1.25rem",
+            "gutter": "1.5rem",
+            "margin": "2.5rem"
+          },
+          "fontFamily": {
+            "headline": ["Merriweather", "serif"],
+            "body": ["Plus Jakarta Sans", "sans-serif"],
+            "headline-xl": ["Merriweather", "serif"],
+            "headline-lg": ["Merriweather", "serif"],
+            "headline-md": ["Merriweather", "serif"],
+            "headline-sm": ["Merriweather", "serif"],
+            "body-xl": ["Plus Jakarta Sans", "sans-serif"],
+            "body-lg": ["Plus Jakarta Sans", "sans-serif"],
+            "body-md": ["Plus Jakarta Sans", "sans-serif"],
+            "label-lg": ["Plus Jakarta Sans", "sans-serif"],
+            "label-md": ["Plus Jakarta Sans", "sans-serif"],
+            "label-sm": ["Plus Jakarta Sans", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    .calm-card-elevation {
+      box-shadow: 0 4px 16px -2px rgba(83, 73, 56, 0.05), 0 2px 6px -1px rgba(83, 73, 56, 0.03);
+    }
+    .calm-dialogue-elevation {
+      box-shadow: 0 12px 32px -4px rgba(83, 73, 56, 0.08), 0 4px 12px -2px rgba(83, 73, 56, 0.04);
+    }
+    .shadow-warm-resting {
+      box-shadow: 0 2px 8px rgba(83, 73, 56, 0.06);
+    }
+    .shadow-warm-elevated {
+      box-shadow: 0 6px 20px rgba(83, 73, 56, 0.1);
+    }
+
+    /* Accessibility Text Scaling */
+    body.text-size-large {
+      font-size: 115% !important;
+    }
+    body.text-size-large h1 { font-size: 2.2rem !important; }
+    body.text-size-large h2 { font-size: 1.8rem !important; }
+    body.text-size-large p { font-size: 1.25rem !important; }
+
+    body.text-size-xlarge {
+      font-size: 130% !important;
+    }
+    body.text-size-xlarge h1 { font-size: 2.5rem !important; }
+    body.text-size-xlarge h2 { font-size: 2.0rem !important; }
+    body.text-size-xlarge p { font-size: 1.4rem !important; }
+
+    /* Custom Gentle Focus Outline */
+    a:focus-visible, button:focus-visible {
+      outline: 3px solid #3b5341 !important;
+      outline-offset: 2px !important;
+    }
+
+    /* Screen fit & Prevent horizontal overflow */
+    html, body {
+      overflow-x: hidden;
+      max-width: 100vw;
+      box-sizing: border-box;
+    }
+    *, *:before, *:after {
+      box-sizing: border-box;
+    }
+  </style>
+
+  <!-- Global Translation Bridge for Client Scripts -->
+  <script>
+    window.MB_TRANSLATIONS = {{ T_JSON|safe }};
+    window.CURRENT_LANG = "{{ LANG }}";
+    function tr(key, fallback) {
+      if (window.MB_TRANSLATIONS && window.MB_TRANSLATIONS[key]) {
+        return window.MB_TRANSLATIONS[key];
+      }
+      return fallback !== undefined ? fallback : key;
+    }
+  </script>
+
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col font-body selection:bg-secondary-container selection:text-on-secondary-fixed">
+
+  <!-- ========================================== -->
+  <!-- TOP APP BAR (Shared Navigation)            -->
+  <!-- ========================================== -->
+  <header class="bg-surface border-b border-outline-variant shadow-sm w-full sticky top-0 z-50">
+    <div class="w-full px-4 sm:px-6 py-2.5 flex items-center justify-between max-w-7xl mx-auto">
+      
+      <!-- Brand & Primary Nav Group -->
+      <div class="flex items-center gap-3 lg:gap-6 flex-shrink-0">
+        <a href="{% url 'home' %}" class="flex items-center gap-2.5 flex-shrink-0 group">
+          <div class="w-9 h-9 rounded-full bg-secondary-container flex items-center justify-center text-primary flex-shrink-0 group-hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">spa</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-lg sm:text-xl font-headline font-bold text-primary tracking-tight">{{ T.brand_name }}</span>
+            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-secondary-container text-primary">NER</span>
+            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-secondary-container text-primary">{{ T.ner_badge|default:"NER" }}</span>
+          </div>
+        </a>
+
+        <!-- Primary Navigation Links (Concise, single-line) -->
+        <nav class="hidden md:flex items-center gap-1 lg:gap-2">
+          <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}text-primary bg-secondary-container/60 font-bold{% else %}text-on-surface-variant hover:text-primary hover:bg-surface-container-low{% endif %} text-sm px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors">
+            {{ T.nav_home }}
+          </a>
+          <a href="{% url 'games_library' %}" class="{% if 'game' in request.resolver_match.url_name %}text-primary bg-secondary-container/60 font-bold{% else %}text-on-surface-variant hover:text-primary hover:bg-surface-container-low{% endif %} text-sm px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors">
+            {{ T.nav_games }}
+          </a>
+          <a href="{% url 'memories' %}" class="{% if request.resolver_match.url_name == 'memories' %}text-primary bg-secondary-container/60 font-bold{% else %}text-on-surface-variant hover:text-primary hover:bg-surface-container-low{% endif %} text-sm px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors">
+            {{ T.nav_memories }}
+          </a>
+          <a href="{% url 'caregiver' %}" class="{% if request.resolver_match.url_name == 'caregiver' %}text-primary bg-secondary-container/60 font-bold{% else %}text-on-surface-variant hover:text-primary hover:bg-surface-container-low{% endif %} text-sm px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors">
+            {{ T.nav_caregiver }}
+          </a>
+        </nav>
+      </div>
+
+      <!-- Trailing Action Controls -->
+      <div class="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
+        
+        <!-- Language Selector Dropdown (Compact native pill) -->
+        <div class="relative inline-block" id="languageSelectorWrapper">
+          <button id="languageSelectorBtn" aria-expanded="false" aria-haspopup="true" class="h-9 px-2.5 sm:px-3 rounded-full bg-surface-container-low hover:bg-surface-container transition-colors flex items-center gap-1.5 border border-outline-variant text-xs sm:text-sm">
+            <span class="material-symbols-outlined text-primary text-base">language</span>
+            <span class="font-semibold text-on-surface whitespace-nowrap">{{ CURRENT_LANG_NATIVE }}</span>
+            <span class="material-symbols-outlined text-xs text-on-surface-variant">arrow_drop_down</span>
+          </button>
+          
+          <div id="languageDropdownMenu" class="hidden absolute right-0 mt-2 w-64 rounded-xl bg-surface-container-lowest border border-outline-variant calm-dialogue-elevation p-2 z-50 shadow-xl">
+            <div class="px-3 py-2 border-b border-outline-variant text-xs text-on-surface-variant font-semibold">
+              {{ T.language_label }}: North East & English
+              {{ T.language_label }}: {{ T.lang_selector_title|default:"North East & English" }}
+            </div>
+            <div class="py-1 max-h-64 overflow-y-auto space-y-1">
+              {% for code, label, native in SUPPORTED_LANGUAGES %}
+                <a href="{% url 'set_language' %}?lang={{ code }}&next={{ request.path }}" 
+                   class="w-full text-left px-3 py-2 rounded-lg {% if LANG == code %}bg-secondary-container text-primary font-bold{% else %}hover:bg-surface-container text-on-surface{% endif %} text-xs sm:text-sm flex items-center justify-between transition-colors">
+                  <span>{{ label }}</span>
+                  {% if LANG == code %}
+                    <span class="material-symbols-outlined text-base">check</span>
+                  {% endif %}
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Text Size Control -->
+        <button id="textSizeBtn" title="{{ T.text_size }}" class="h-9 px-2.5 rounded-full bg-surface-container-low hover:bg-surface-container transition-colors flex items-center gap-1 border border-outline-variant text-xs font-medium text-on-surface">
+          <span class="material-symbols-outlined text-primary text-base">format_size</span>
+          <span class="hidden xl:inline text-xs">{{ T.text_size }}</span>
+        </button>
+
+        <!-- Read Aloud Trigger -->
+        <button id="readAloudBtn" title="{{ T.read_aloud }}" class="h-9 px-2.5 rounded-full bg-surface-container-low hover:bg-surface-container transition-colors flex items-center gap-1 border border-outline-variant text-xs font-semibold text-primary">
+          <span class="material-symbols-outlined text-primary text-base">volume_up</span>
+          <span class="hidden xl:inline text-xs">{{ T.read_aloud }}</span>
+        </button>
+
+        <!-- Need a Hand? Assistance Trigger -->
+        <button id="needHandBtn" class="h-9 px-3 rounded-full bg-primary hover:bg-primary-container text-on-primary transition-colors flex items-center gap-1.5 shadow-sm text-xs sm:text-sm font-semibold whitespace-nowrap">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings: 'FILL' 1;">support_agent</span>
+          <span>{{ T.need_hand }}</span>
+        </button>
+
+        <!-- User / Caregiver Profile Switcher -->
+        <div class="relative inline-block ml-0.5">
+          {% if CURRENT_PROFILE.role == 'caregiver' %}
+            <a href="{% url 'switch_profile' 'eleanor' %}" 
+               title="Sarah (Caregiver) • Click to switch to Eleanor"
+               class="flex items-center gap-1 p-0.5 rounded-full border-2 border-primary hover:scale-105 transition-all">
+              <img class="w-8 h-8 rounded-full object-cover" 
+                   src="{% static 'images/stitch/img_570dff029353.jpg' %}" 
+                   alt="Caregiver Sarah">
+            </a>
+          {% else %}
+            <a href="{% url 'switch_profile' 'sarah' %}" 
+               title="Eleanor • Click to switch to Sarah"
+               class="flex items-center gap-1 p-0.5 rounded-full border-2 border-surface-container-high hover:border-primary hover:scale-105 transition-all">
+              <img class="w-8 h-8 rounded-full object-cover" 
+                   src="{% static 'images/stitch/img_a3312d477143.jpg' %}" 
+                   alt="Eleanor">
+            </a>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Secondary Navigation Bar -->
+  <div class="md:hidden bg-surface-container border-b border-outline-variant px-4 py-2 flex items-center justify-around text-xs font-semibold">
+    <a href="{% url 'home' %}" class="flex flex-col items-center gap-0.5 {% if request.resolver_match.url_name == 'home' %}text-primary font-bold{% else %}text-on-surface-variant{% endif %}">
+      <span class="material-symbols-outlined text-xl">home</span>
+      <span>{{ T.nav_home }}</span>
+    </a>
+    <a href="{% url 'games_library' %}" class="flex flex-col items-center gap-0.5 {% if 'game' in request.resolver_match.url_name %}text-primary font-bold{% else %}text-on-surface-variant{% endif %}">
+      <span class="material-symbols-outlined text-xl">extension</span>
+      <span>{{ T.nav_games }}</span>
+    </a>
+    <a href="{% url 'memories' %}" class="flex flex-col items-center gap-0.5 {% if request.resolver_match.url_name == 'memories' %}text-primary font-bold{% else %}text-on-surface-variant{% endif %}">
+      <span class="material-symbols-outlined text-xl">photo_library</span>
+      <span>{{ T.nav_memories }}</span>
+    </a>
+    <a href="{% url 'caregiver' %}" class="flex flex-col items-center gap-0.5 {% if request.resolver_match.url_name == 'caregiver' %}text-primary font-bold{% else %}text-on-surface-variant{% endif %}">
+      <span class="material-symbols-outlined text-xl">favorite</span>
+      <span>{{ T.nav_caregiver }}</span>
+    </a>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MAIN CONTENT                               -->
+  <!-- ========================================== -->
+  {% block content %}{% endblock %}
+
+  <!-- ========================================== -->
+  <!-- NEED A HAND ASSISTANCE MODAL               -->
+  <!-- ========================================== -->
+  <div id="needHandModal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-surface rounded-2xl max-w-md w-full p-6 sm:p-8 border border-outline-variant calm-dialogue-elevation relative animate-in fade-in">
+      <button id="closeHandModal" class="absolute top-4 right-4 text-on-surface-variant hover:text-primary">
+        <span class="material-symbols-outlined text-2xl">close</span>
+      </button>
+
+      <div class="text-center space-y-4">
+        <div class="w-16 h-16 rounded-full bg-secondary-container mx-auto flex items-center justify-center text-primary">
+          <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+        </div>
+        
+        <div>
+          <h3 class="font-headline font-bold text-2xl text-on-surface">{{ T.modal_help_title }}</h3>
+          <p class="text-base text-on-surface-variant mt-2 leading-relaxed">
+            {{ T.modal_help_sub }}
+          </p>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <a href="tel:5550192" class="w-full py-3.5 px-6 rounded-xl bg-primary text-on-primary font-semibold flex items-center justify-center gap-3 shadow hover:bg-primary-container transition-colors">
+            <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">call</span>
+            <span>{{ T.call_sarah_btn }}</span>
+          </a>
+
+          <button onclick="speakPageText('{{ T.modal_help_title }}. {{ T.modal_help_sub }}'); alert('{{ T.sarah_notified }}'); closeNeedHandModal();" 
+                  class="w-full py-3.5 px-6 rounded-xl bg-surface-container border border-outline-variant text-on-surface font-semibold flex items-center justify-center gap-3 hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined text-xl">notifications_active</span>
+            <span>{{ T.send_ring_btn }}</span>
+          </button>
+        </div>
+
+        <p class="text-xs text-on-surface-variant italic pt-2">
+          {{ T.footer_tagline }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- FOOTER                                     -->
+  <!-- ========================================== -->
+  <footer class="bg-surface-container-low border-t border-outline-variant mt-auto py-8">
+    <div class="w-full px-4 sm:px-6 max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      
+      <div class="space-y-1 text-center md:text-left">
+        <div class="flex items-center justify-center md:justify-start gap-2">
+          <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">spa</span>
+          <span class="font-headline font-bold text-lg text-primary">{{ T.brand_name }}</span>
+          <span class="text-xs bg-secondary-container text-primary font-semibold px-2 py-0.5 rounded-full">NER Platform</span>
+          <span class="text-xs bg-secondary-container text-primary font-semibold px-2 py-0.5 rounded-full">{{ T.ner_badge|default:"NER Platform" }}</span>
+        </div>
+        <p class="text-sm text-on-surface-variant max-w-lg">
+          {{ T.footer_tagline }}
+        </p>
+        <p class="text-xs text-outline italic">
+          {{ T.footer_disclaimer }}
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-on-surface-variant">
+        <a href="{% url 'home' %}" class="hover:text-primary transition-colors">{{ T.nav_home }}</a>
+        <span>•</span>
+        <a href="{% url 'games_library' %}" class="hover:text-primary transition-colors">{{ T.nav_games }}</a>
+        <span>•</span>
+        <a href="{% url 'memories' %}" class="hover:text-primary transition-colors">{{ T.nav_memories }}</a>
+        <span>•</span>
+        <a href="{% url 'caregiver' %}" class="hover:text-primary transition-colors">{{ T.nav_caregiver }}</a>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ========================================== -->
+  <!-- SHARED AUDIO & ACCESSIBILITY SCRIPT        -->
+  <!-- ========================================== -->
+  <script>
+    // 1. Language Dropdown Toggle
+    const langBtn = document.getElementById('languageSelectorBtn');
+    const langMenu = document.getElementById('languageDropdownMenu');
+    if (langBtn && langMenu) {
+      langBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        langMenu.classList.toggle('hidden');
+      });
+      document.addEventListener('click', (e) => {
+        if (!langMenu.contains(e.target) && e.target !== langBtn) {
+          langMenu.classList.add('hidden');
+        }
+      });
+    }
+
+    // 2. Text Size Toggle (Normal -> Large -> Extra Large)
+    const textSizeBtn = document.getElementById('textSizeBtn');
+    const textSizes = ['', 'text-size-large', 'text-size-xlarge'];
+    let currentSizeIndex = parseInt(localStorage.getItem('mindbloom_text_size_idx') || '0');
+    if (textSizes[currentSizeIndex]) {
+      document.body.classList.add(textSizes[currentSizeIndex]);
+    }
+    if (textSizeBtn) {
+      textSizeBtn.addEventListener('click', () => {
+        if (textSizes[currentSizeIndex]) {
+          document.body.classList.remove(textSizes[currentSizeIndex]);
+        }
+        currentSizeIndex = (currentSizeIndex + 1) % textSizes.length;
+        if (textSizes[currentSizeIndex]) {
+          document.body.classList.add(textSizes[currentSizeIndex]);
+        }
+        localStorage.setItem('mindbloom_text_size_idx', currentSizeIndex);
+      });
+    }
+
+    // 3. Web Audio API Peaceful Chime Synthesizer
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playGentleChime(type) {
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        
+        if (type === 'bell' || type === 'chime') {
+          // Warm harmonic chime (F5 / C6 / G6)
+          [698.46, 1046.50, 1567.98].forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+            gain.gain.setValueAtTime(0.08 / (idx + 1), now + idx * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.08 + 1.2);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + idx * 0.08);
+            osc.stop(now + idx * 0.08 + 1.2);
+          });
+        } else if (type === 'success' || type === 'celebration') {
+          // Serene major chord arpeggio
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+            gain.gain.setValueAtTime(0.1, now + idx * 0.12);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.12 + 1.5);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + idx * 0.12);
+            osc.stop(now + idx * 0.12 + 1.5);
+          });
+        } else if (type === 'tap') {
+          // Soft water droplet tap
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(800, now);
+          osc.frequency.exponentialRampToValueAtTime(400, now + 0.15);
+          gain.gain.setValueAtTime(0.06, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else if (type === 'hint') {
+          // Warm soft note
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.8);
+        }
+      } catch (e) {
+        console.log("Audio feedback error:", e);
+      }
+    }
+
+    // 4. SpeechSynthesis "Read Aloud" Helper
+    function speakPageText(customText) {
+      if (!('speechSynthesis' in window)) {
+        alert("Audio narration is not supported by your current browser.");
+        return;
+      }
+      window.speechSynthesis.cancel();
+      
+      let textToRead = customText;
+      if (!textToRead) {
+        // Find main page heading and main instructions
+        const h1 = document.querySelector('h1');
+        const p = document.querySelector('main p');
+        textToRead = (h1 ? h1.innerText + ". " : "") + (p ? p.innerText : "");
+      }
+      if (!textToRead) textToRead = "Welcome to MindBloom. Take your time and enjoy a calm, gentle moment.";
+
+      const utter = new SpeechSynthesisUtterance(textToRead);
+      utter.rate = 0.88; // Calm, gentle cadence suitable for elderly users
+      utter.pitch = 1.0;
+      window.speechSynthesis.speak(utter);
+    }
+
+    const readAloudBtn = document.getElementById('readAloudBtn');
+    if (readAloudBtn) {
+      readAloudBtn.addEventListener('click', () => speakPageText());
+    }
+
+    // 5. Need a Hand Modal
+    const needHandBtn = document.getElementById('needHandBtn');
+    const needHandModal = document.getElementById('needHandModal');
+    const closeHandModal = document.getElementById('closeHandModal');
+
+    function openNeedHandModal() {
+      if (needHandModal) needHandModal.classList.remove('hidden');
+    }
+    function closeNeedHandModal() {
+      if (needHandModal) needHandModal.classList.add('hidden');
+    }
+
+    if (needHandBtn) needHandBtn.addEventListener('click', openNeedHandModal);
+    if (closeHandModal) closeHandModal.addEventListener('click', closeNeedHandModal);
+    if (needHandModal) {
+      needHandModal.addEventListener('click', (e) => {
+        if (e.target === needHandModal) closeNeedHandModal();
+      });
+    }
+
+    // 6. CSRF Helper for Fetch requests
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+  </script>
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

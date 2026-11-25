@@ -1,0 +1,397 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}MindBloom — {{ T.home }}{% endblock %}
+
+{% block content %}
+<main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-10">
+
+  <!-- ========================================== -->
+  <!-- ORIENTATION & GREETING BANNER              -->
+  <!-- ========================================== -->
+  <section class="w-full bg-surface-container-lowest rounded-2xl border border-outline-variant calm-card-elevation p-6 sm:p-10 transition-all">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      
+      <!-- Left Greeting Content -->
+      <div class="lg:col-span-7 space-y-5">
+        <!-- Date & Weather Pill -->
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container border border-outline-variant text-on-surface-variant text-sm font-medium">
+          <span class="material-symbols-outlined text-primary text-lg">calendar_today</span>
+          <span>{{ T.home_date_weather }}</span>
+        </div>
+
+        <!-- Main Reassuring Headline -->
+        <h1 class="font-headline font-bold text-3xl sm:text-4xl text-on-surface leading-tight">
+          {{ T.good_morning }}
+        </h1>
+
+        <!-- Gentle Affirmation Text -->
+        <p class="text-lg sm:text-xl text-on-surface-variant leading-relaxed max-w-2xl font-body">
+          {{ T.good_morning_sub }}
+        </p>
+
+        <!-- Status Badges -->
+        <div class="flex flex-wrap items-center gap-3 pt-2">
+          <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary-fixed text-on-secondary-fixed text-sm font-semibold">
+            <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+            <span>{{ T.tea_enjoyed }}</span>
+          </div>
+          <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container text-on-surface-variant text-sm font-medium">
+            <span class="material-symbols-outlined text-lg">schedule</span>
+            <span>{{ T.garden_stroll }}</span>
+          </div>
+          <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container text-on-surface-variant text-sm font-medium">
+            <span class="material-symbols-outlined text-lg text-primary">spa</span>
+            <span>{{ T.activities_ready }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Photographic Card -->
+      <div class="lg:col-span-5">
+        <div class="bg-surface-container-low p-3 rounded-2xl border border-outline-variant calm-card-elevation">
+          <div class="relative w-full h-64 md:h-72 rounded-xl overflow-hidden shadow-inner">
+            <img class="w-full h-full object-cover" 
+                 src="{% static 'images/stitch/img_6e4e4d05964b.jpg' %}" 
+                 alt="Sunlit sitting room with tea">
+            <div class="absolute bottom-3 left-3 right-3 bg-surface-container-lowest/95 backdrop-blur-sm rounded-xl p-3 border border-outline-variant shadow-sm">
+              <p class="text-sm font-medium text-on-surface flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">wb_sunny</span>
+                <span>{{ T.sitting_room_sunlight }}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- SECTION TITLE: Daily Choices               -->
+  <!-- ========================================== -->
+  <div class="flex items-center justify-between pt-2">
+    <div class="space-y-1">
+      <h2 class="font-headline font-bold text-2xl sm:text-3xl text-on-surface">{{ T.gentle_flow }}</h2>
+      <p class="text-base sm:text-lg text-on-surface-variant">{{ T.gentle_flow_sub }}</p>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- FOUR LARGE ACTION CARDS (2x2 Grid)         -->
+  <!-- ========================================== -->
+  <section class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+    
+    <!-- Card 1: Gentle Brain Games -->
+    <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant calm-card-elevation p-6 sm:p-8 flex flex-col justify-between space-y-6 hover:border-primary transition-all group">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-secondary-fixed text-on-secondary-fixed text-xs font-semibold">
+            <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">spa</span>
+            {{ T.tea_gardens_flora|default:"Playful & Calm" }}
+          </span>
+          <div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-2xl">extension</span>
+          </div>
+        </div>
+        <h3 class="font-headline font-bold text-2xl text-on-surface">{{ T.games }}</h3>
+        <p class="text-base text-on-surface-variant leading-relaxed font-body">
+          {{ T.card_games_desc }}
+        </p>
+      </div>
+      <div>
+        <a href="{% url 'games_library' %}" class="w-full min-h-[56px] px-6 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-semibold flex items-center justify-center gap-3 transition-colors shadow">
+          <span>{{ T.card_games_btn }}</span>
+          <span class="material-symbols-outlined text-xl">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Card 2: My Cherished Memories -->
+    <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant calm-card-elevation p-6 sm:p-8 flex flex-col justify-between space-y-6 hover:border-primary transition-all group">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed text-xs font-semibold">
+            <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">photo_library</span>
+            {{ memories_count|default:"5" }} {{ T.memories }}
+          </span>
+          <div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-tertiary group-hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-2xl">photo_album</span>
+          </div>
+        </div>
+        <h3 class="font-headline font-bold text-2xl text-on-surface">{{ T.memories }}</h3>
+        <p class="text-base text-on-surface-variant leading-relaxed font-body">
+          {{ T.card_memories_desc }}
+        </p>
+      </div>
+      <div>
+        <a href="{% url 'memories' %}" class="w-full min-h-[56px] px-6 rounded-xl bg-surface-container hover:bg-surface-container-high border-2 border-primary text-primary font-semibold flex items-center justify-center gap-3 transition-colors">
+          <span>{{ T.card_memories_btn }}</span>
+          <span class="material-symbols-outlined text-xl">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Card 3: Daily Rhythm & Comfort -->
+    <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant calm-card-elevation p-6 sm:p-8 flex flex-col justify-between space-y-6 hover:border-primary transition-all group">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container text-on-surface text-xs font-semibold">
+            <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">schedule</span>
+            {{ pending_reminders_count }} {{ T.reminders }}
+          </span>
+          <div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-2xl">self_improvement</span>
+          </div>
+        </div>
+        <h3 class="font-headline font-bold text-2xl text-on-surface">{{ T.reminders }}</h3>
+        <p class="text-base text-on-surface-variant leading-relaxed font-body">
+          {{ T.card_rhythm_desc }}
+        </p>
+      </div>
+      <div>
+        <a href="#reminders-section" class="w-full min-h-[56px] px-6 rounded-xl bg-surface-container hover:bg-surface-container-high border-2 border-primary text-primary font-semibold flex items-center justify-center gap-3 transition-colors">
+          <span>{{ T.card_rhythm_btn }}</span>
+          <span class="material-symbols-outlined text-xl">arrow_downward</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Card 4: Caregiver & Family Circle -->
+    <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant calm-card-elevation p-6 sm:p-8 flex flex-col justify-between space-y-6 hover:border-primary transition-all group">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-secondary-fixed text-on-secondary-fixed text-xs font-semibold">
+            <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">favorite</span>
+            {{ T.daughter_sarah|default:"Sarah" }}
+          </span>
+          <div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-2xl">family_restroom</span>
+          </div>
+        </div>
+        <h3 class="font-headline font-bold text-2xl text-on-surface">{{ T.caregiver }}</h3>
+        <p class="text-base text-on-surface-variant leading-relaxed font-body">
+          {{ T.card_progress_desc }}
+        </p>
+      </div>
+      <div>
+        <a href="{% url 'caregiver' %}" class="w-full min-h-[56px] px-6 rounded-xl bg-surface-container hover:bg-surface-container-high border-2 border-primary text-primary font-semibold flex items-center justify-center gap-3 transition-colors">
+          <span>{{ T.card_progress_btn }}</span>
+          <span class="material-symbols-outlined text-xl">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ========================================== -->
+  <!-- A GENTLE MOMENT FOR TODAY (Bento Block)    -->
+  <!-- ========================================== -->
+  <section class="bg-surface-container-low rounded-2xl border border-outline-variant p-6 sm:p-10 calm-card-elevation space-y-6">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-primary">
+        <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">local_florist</span>
+      </div>
+      <div>
+        <h2 class="font-headline font-bold text-2xl text-on-surface">{{ T.gentle_moment_title }}</h2>
+        <p class="text-sm text-on-surface-variant">{{ T.gentle_moment_sub }}</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      
+      <!-- Focus Activity: Memory Match -->
+      <div class="lg:col-span-7 bg-surface-container-lowest rounded-xl p-6 border border-outline-variant space-y-4">
+        <div class="flex flex-col sm:flex-row items-start gap-4">
+          <div class="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 border border-outline-variant">
+            <img class="w-full h-full object-cover" 
+                 src="{% static 'images/stitch/img_1f1248216929.jpg' %}" 
+                 alt="Botanical illustration">
+          </div>
+          <div class="space-y-1">
+            <span class="text-xs font-bold text-tertiary uppercase tracking-wider">{{ T.suggested_activity }}</span>
+            <h3 class="font-headline font-bold text-xl text-on-surface">{{ T.suggested_activity_title }}</h3>
+            <p class="text-sm text-on-surface-variant leading-relaxed">
+              {{ T.suggested_activity_desc }}
+            </p>
+          </div>
+        </div>
+        <div class="pt-2 flex flex-wrap items-center gap-4">
+          <a href="{% url 'memory_match' %}" class="min-h-[52px] px-6 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-semibold flex items-center gap-2 transition-colors shadow">
+            <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+            <span>{{ T.start_activity }}</span>
+          </a>
+          <span class="text-sm text-on-surface-variant flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">timer</span>
+            <span>{{ T.untimed_5mins }}</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Focus Activity 2: Voice Note from Maya -->
+      <div class="lg:col-span-5 bg-surface-container-lowest rounded-xl p-6 border border-outline-variant space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full overflow-hidden border border-outline-variant flex-shrink-0">
+            <img class="w-full h-full object-cover" 
+                 src="{% static 'images/stitch/img_0494a76357d6.jpg' %}" 
+                 alt="Granddaughter Maya portrait">
+          </div>
+          <div>
+            <h4 class="font-headline font-bold text-lg text-on-surface">{{ T.maya_voice_note }}</h4>
+            <p class="text-xs text-on-surface-variant">{{ T.granddaughter_morning }}</p>
+          </div>
+        </div>
+
+        <div class="bg-surface-container p-4 rounded-xl border border-outline-variant flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <button onclick="playMayaVoiceNote()" class="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center hover:bg-primary-container transition-colors shadow">
+              <span class="material-symbols-outlined text-2xl" id="mayaPlayIcon" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+            </button>
+            <div>
+              <p class="text-sm font-semibold text-on-surface">{{ T.maya_quote_title }}</p>
+              <p class="text-xs text-on-surface-variant">{{ T.maya_quote_time }}</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-primary text-2xl">graphic_eq</span>
+        </div>
+        <p class="text-sm text-on-surface-variant italic">
+          {{ T.maya_quote_text }}
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- DAILY REMINDERS CHECKLIST                  -->
+  <!-- ========================================== -->
+  <section id="reminders-section" class="bg-surface-container-lowest rounded-2xl border border-outline-variant calm-card-elevation p-6 sm:p-10 space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant pb-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+          <span class="material-symbols-outlined text-2xl">check_box</span>
+        </div>
+        <div>
+          <h2 class="font-headline font-bold text-2xl text-on-surface">{{ T.reminders }}</h2>
+          <p class="text-sm text-on-surface-variant">{{ T.gentle_flow_sub }}</p>
+        </div>
+      </div>
+      <span class="text-xs font-semibold px-3 py-1.5 rounded-full bg-surface-container text-on-surface-variant">
+        {{ T.wednesday_schedule }}
+      </span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {% for r in reminders %}
+        <div class="p-4 rounded-xl border {% if r.is_completed %}bg-surface-container-low border-outline-variant/60 opacity-80{% else %}bg-surface border-outline-variant{% endif %} flex items-center justify-between gap-4 transition-all">
+          <div class="flex items-center gap-4">
+            <button onclick="toggleReminder({{ r.id }}, this)" 
+                    class="w-8 h-8 rounded-full border-2 {% if r.is_completed %}bg-primary border-primary text-on-primary{% else %}border-outline text-transparent hover:border-primary{% endif %} flex items-center justify-center transition-all">
+              <span class="material-symbols-outlined text-lg">check</span>
+            </button>
+            <div>
+              <p class="text-base font-semibold {% if r.is_completed %}line-through text-on-surface-variant{% else %}text-on-surface{% endif %}">
+                {{ r.display_title|default:r.title }}
+              </p>
+              <div class="flex items-center gap-2 text-xs text-on-surface-variant mt-0.5">
+                <span class="material-symbols-outlined text-sm">{{ r.icon }}</span>
+                <span>{{ r.time_str }}</span>
+              </div>
+            </div>
+          </div>
+          {% if r.is_completed %}
+            <span class="text-xs px-2.5 py-1 rounded-full bg-secondary-container text-primary font-bold">{{ T.done }}</span>
+          {% else %}
+            <span class="text-xs px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface-variant">{{ T.upcoming }}</span>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- RECENT MEMORIES PREVIEW                    -->
+  <!-- ========================================== -->
+  <section class="space-y-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="font-headline font-bold text-2xl text-on-surface">{{ T.memories }}</h2>
+        <p class="text-sm text-on-surface-variant">{{ T.recent_memories_sub }}</p>
+      </div>
+      <a href="{% url 'memories' %}" class="text-sm font-semibold text-primary hover:underline flex items-center gap-1">
+        <span>{{ T.view_all_scrapbook }}</span>
+        <span class="material-symbols-outlined text-base">arrow_forward</span>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for m in recent_memories %}
+        <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant calm-card-elevation overflow-hidden flex flex-col justify-between hover:border-primary transition-all">
+          <div class="h-48 w-full overflow-hidden bg-surface-container relative">
+            <img src="{{ m.image_url }}" alt="{{ m.display_title|default:m.title }}" class="w-full h-full object-cover">
+            <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-surface-container-lowest/90 backdrop-blur-sm text-xs font-semibold text-primary">
+              {{ m.period }}
+            </span>
+          </div>
+          <div class="p-5 space-y-2 flex-grow">
+            <h3 class="font-headline font-bold text-lg text-on-surface">{{ m.display_title|default:m.title }}</h3>
+            <p class="text-sm text-on-surface-variant line-clamp-3 leading-relaxed">
+              {{ m.display_description|default:m.description }}
+            </p>
+          </div>
+          <div class="p-5 pt-0 border-t border-surface-container flex items-center justify-between text-xs text-on-surface-variant">
+            <span>{{ m.display_location|default:m.location }}</span>
+            <span class="text-primary font-semibold">{{ m.get_tag_display }}</span>
+            <span class="text-primary font-semibold">{{ m.display_tag|default:m.get_tag_display }}</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Toggle Reminder via AJAX
+  function toggleReminder(id, btn) {
+    playGentleChime('tap');
+    fetch(`/api/toggle-reminder/${id}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        playGentleChime(data.is_completed ? 'success' : 'hint');
+        window.location.reload();
+      }
+    })
+    .catch(err => console.error("Toggle reminder error:", err));
+  }
+
+  // Play Maya's Voice Note via SpeechSynthesis simulation
+  let isPlayingMaya = false;
+  function playMayaVoiceNote() {
+    const icon = document.getElementById('mayaPlayIcon');
+    if (!isPlayingMaya) {
+      isPlayingMaya = true;
+      if (icon) icon.textContent = 'pause';
+      playGentleChime('chime');
+      speakPageText("Have a wonderful morning, Grandma! I am thinking of you as I walk to school today. Sarah told me you loved the sweet marigolds we planted. I will visit you on Sunday with fresh tea leaves!");
+      setTimeout(() => {
+        isPlayingMaya = false;
+        if (icon) icon.textContent = 'play_arrow';
+      }, 9000);
+    } else {
+      window.speechSynthesis.cancel();
+      isPlayingMaya = false;
+      if (icon) icon.textContent = 'play_arrow';
+    }
+  }
+</script>
+{% endblock %}

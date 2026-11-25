@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}MindBloom — {{ T.memories }}{% endblock %}
+
+{% block extra_head %}
+<style>
+  .paper-shadow {
+    box-shadow: 0 4px 20px -2px rgba(83, 73, 56, 0.06), 0 2px 8px -1px rgba(83, 73, 56, 0.03);
+  }
+  .washi-tape {
+    background-color: rgba(214, 232, 205, 0.7);
+    backdrop-filter: blur(2px);
+  }
+  .font-script {
+    font-family: 'Merriweather', serif;
+    font-style: italic;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-8 py-8 md:py-12 space-y-10">
+
+  <!-- ========================================== -->
+  <!-- Page Title & Reassuring Intro Section      -->
+  <!-- ========================================== -->
+  <section class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 sm:p-10 paper-shadow relative overflow-hidden">
+    <div class="max-w-3xl space-y-4">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF3E3] text-[#6E5523] text-xs font-bold border border-[#EEDB9F]/50">
+        <span class="material-symbols-outlined text-base">sunny</span>
+        <span>{{ T.scrapbook_badge }}</span>
+      </div>
+
+      <h1 class="font-headline font-bold text-3xl sm:text-4xl text-on-surface tracking-tight">
+        {{ T.memories }}
+      </h1>
+
+      <p class="text-lg text-on-surface-variant leading-relaxed font-body">
+        {{ T.memories_sub }}
+      </p>
+
+      <!-- Action Buttons Row -->
+      <div class="pt-2 flex flex-wrap items-center gap-4">
+        <button onclick="openAddMemoryModal()" class="inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-xl bg-primary text-on-primary font-bold text-base shadow hover:bg-primary-container transition-colors min-h-[56px] cursor-pointer">
+          <span class="material-symbols-outlined text-2xl">add_circle</span>
+          <span>{{ T.add_memory_btn }}</span>
+        </button>
+
+        <button onclick="playAllRecordings()" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-surface-container-lowest border-2 border-primary text-on-surface font-bold text-base hover:bg-surface-container transition-colors min-h-[56px] cursor-pointer" id="playAllRecordingsBtn">
+          <span class="material-symbols-outlined text-primary text-2xl" id="playAllIcon">record_voice_over</span>
+          <span>{{ T.play_all_recordings }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Category Filter Ribbon -->
+    <div class="mt-8 pt-6 border-t border-outline-variant/50 flex items-center gap-3 overflow-x-auto pb-2">
+      <span class="text-sm font-semibold text-on-surface-variant flex items-center gap-1 mr-2 shrink-0">
+        <span class="material-symbols-outlined text-base">filter_vintage</span>
+        <span>{{ T.browse_by }}</span>
+      </span>
+
+      <a href="{% url 'memories' %}" class="px-5 py-2 rounded-full {% if not active_tag or active_tag == 'all' %}bg-primary text-on-primary font-bold shadow{% else %}bg-surface-container hover:bg-surface-container-high text-on-surface-variant{% endif %} text-sm shrink-0 transition-colors">
+        {{ T.all_memories }} ({{ all_count }})
+      </a>
+      <a href="{% url 'memories' %}?tag=family" class="px-5 py-2 rounded-full {% if active_tag == 'family' %}bg-primary text-on-primary font-bold shadow{% else %}bg-surface-container hover:bg-surface-container-high text-on-surface-variant{% endif %} text-sm shrink-0 transition-colors">
+        {{ T.family_holidays }}
+      </a>
+      <a href="{% url 'memories' %}?tag=garden" class="px-5 py-2 rounded-full {% if active_tag == 'garden' %}bg-primary text-on-primary font-bold shadow{% else %}bg-surface-container hover:bg-surface-container-high text-on-surface-variant{% endif %} text-sm shrink-0 transition-colors">
+        {{ T.garden_nature }}
+      </a>
+      <a href="{% url 'memories' %}?tag=wedding" class="px-5 py-2 rounded-full {% if active_tag == 'wedding' %}bg-primary text-on-primary font-bold shadow{% else %}bg-surface-container hover:bg-surface-container-high text-on-surface-variant{% endif %} text-sm shrink-0 transition-colors">
+        {{ T.wedding_romance }}
+      </a>
+      <a href="{% url 'memories' %}?tag=travel" class="px-5 py-2 rounded-full {% if active_tag == 'travel' %}bg-primary text-on-primary font-bold shadow{% else %}bg-surface-container hover:bg-surface-container-high text-on-surface-variant{% endif %} text-sm shrink-0 transition-colors">
+        {{ T.travel_places }}
+      </a>
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- Scrapbook Grid Layout                      -->
+  <!-- ========================================== -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    
+    <!-- Left Column: Memory Cards (Span 8) -->
+    <div class="lg:col-span-8 space-y-8">
+      {% for memory in memories %}
+        <article class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 sm:p-8 paper-shadow transition-all relative group">
+          <!-- Washi tape visual detail -->
+          <div class="washi-tape absolute -top-3 left-1/2 -translate-x-1/2 w-32 h-6 rounded transform -rotate-1 shadow-sm pointer-events-none"></div>
+
+          <!-- Metadata row -->
+          <div class="flex items-center justify-between mb-4">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container text-primary text-xs font-bold">
+              <span class="material-symbols-outlined text-sm">photo_library</span>
+              <span>{{ memory.get_tag_display }}</span>
+              <span>{{ memory.display_tag|default:memory.get_tag_display }}</span>
+            </span>
+            <span class="text-sm font-semibold text-on-surface-variant flex items-center gap-1">
+              <span class="material-symbols-outlined text-base">calendar_month</span>
+              <span>{{ memory.period }}</span>
+            </span>
+          </div>
+
+          <!-- Photo Card -->
+          <div class="p-3 sm:p-4 rounded-xl border border-outline-variant bg-[#FFFDF9] mb-5">
+            <div class="aspect-[16/10] overflow-hidden rounded-lg relative bg-surface-container">
+              <img src="{{ memory.image_url }}" alt="{{ memory.display_title|default:memory.title }}" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300">
+            </div>
+            <p class="font-script text-xl text-[#423F37] mt-3 px-2 leading-snug">
+              " {{ memory.display_location|default:memory.location }} "
+            </p>
+          </div>
+
+          <!-- Story Details -->
+          <div class="space-y-4">
+            <h2 class="font-headline font-bold text-2xl text-on-surface">
+              {{ memory.display_title|default:memory.title }}
+            </h2>
+            <p class="text-base text-on-surface-variant leading-relaxed font-body">
+              {{ memory.display_description|default:memory.description }}
+            </p>
+
+            <!-- Audio Player Pill -->
+            <div class="pt-2">
+              <div class="bg-surface-container-low border border-outline-variant rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <button onclick="playMemoryAudio('{{ memory.display_title|default:memory.title|escapejs }}', '{{ memory.display_description|default:memory.description|escapejs }}', this)" 
+                          class="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center hover:bg-primary-container shadow shrink-0 cursor-pointer transition-colors" 
+                          title="Listen to story audio">
+                    <span class="material-symbols-outlined text-2xl memory-play-icon">play_arrow</span>
+                  </button>
+                  <div>
+                    <h3 class="font-bold text-sm text-on-surface">{{ memory.audio_label }}</h3>
+                    <p class="text-xs text-on-surface-variant">{{ memory.audio_duration }} minutes • Gentle acoustic narration</p>
+                    <p class="text-xs text-on-surface-variant">{{ memory.audio_duration }} {{ T.time_spent }} • {{ T.acoustic_narration }}</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1 h-6 w-full sm:w-36 justify-end opacity-75">
+                  <span class="w-1 h-3 bg-primary rounded-full"></span>
+                  <span class="w-1 h-5 bg-primary rounded-full"></span>
+                  <span class="w-1 h-2 bg-primary rounded-full"></span>
+                  <span class="w-1 h-6 bg-primary rounded-full"></span>
+                  <span class="w-1 h-4 bg-outline-variant rounded-full"></span>
+                  <span class="w-1 h-3 bg-outline-variant rounded-full"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-outline-variant text-xs font-semibold text-on-surface-variant">
+              <span class="text-tertiary flex items-center gap-1">
+                <span class="material-symbols-outlined text-base">favorite</span>
+                <span>Eleanor's cherished memory</span>
+                <span>{{ T.eleanor_cherished_memory }}</span>
+              </span>
+              <span class="text-outline">Preserved with love</span>
+              <span class="text-outline">{{ T.preserved_with_love }}</span>
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <div class="text-center py-12 bg-surface-container-lowest rounded-2xl border border-outline-variant p-8">
+          <p class="text-lg text-on-surface-variant">No memories found in this section yet.</p>
+          <p class="text-lg text-on-surface-variant">{{ T.no_memories_found }}</p>
+          <button onclick="openAddMemoryModal()" class="mt-4 px-6 py-2.5 rounded-xl bg-primary text-on-primary font-bold">
+            + Add First Memory
+            {{ T.add_first_memory }}
+          </button>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Right Column: Sidebar Features (Span 4) -->
+    <div class="lg:col-span-4 space-y-6">
+      
+      <!-- Sarah's Postcard Audio Card -->
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 paper-shadow space-y-4">
+        <div class="flex items-center gap-3">
+          <img src="{% static 'images/stitch/img_a3312d477143.jpg' %}" alt="Sarah and Eleanor" class="w-14 h-14 rounded-full object-cover border-2 border-surface-bright">
+          <div>
+            <h3 class="font-headline font-bold text-lg text-on-surface">{{ T.sarah_postcard_title }}</h3>
+            <span class="text-xs text-on-surface-variant">Sent yesterday afternoon</span>
+            <span class="text-xs text-on-surface-variant">{{ T.sent_yesterday_afternoon }}</span>
+          </div>
+        </div>
+
+        <p class="text-sm text-on-surface-variant italic leading-relaxed">
+          {{ T.sarah_postcard_quote }}
+        </p>
+
+        <button onclick="speakPageText('Ma, listening to you talk about St Ives always makes me smile. I am bringing your old photo album when I visit this Saturday! Have a warm cup of tea.'); playGentleChime('chime');" 
+                class="w-full py-3 rounded-xl bg-surface-container hover:bg-surface-container-high border border-outline-variant text-primary font-bold text-sm flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-lg">play_arrow</span>
+          <span>Play Sarah's Audio Note (0:35)</span>
+          <span>{{ T.play_sarah_audio_note }}</span>
+        </button>
+      </div>
+
+      <!-- Quick Add Prompt Banner -->
+      <div class="bg-surface-container-low border border-outline-variant rounded-2xl p-6 paper-shadow space-y-3">
+        <div class="flex items-center gap-2 text-primary font-bold text-sm">
+          <span class="material-symbols-outlined">add_photo_alternate</span>
+          <span>{{ T.preserve_new_memory }}</span>
+        </div>
+        <p class="text-sm text-on-surface-variant leading-relaxed">
+          Do you remember a favourite song, holiday, or family recipe? Add it to your scrapbook with a photograph and voice story.
+          {{ T.remember_song_recipe }}
+        </p>
+        <button onclick="openAddMemoryModal()" class="w-full py-3 rounded-xl bg-primary text-on-primary font-bold text-sm flex items-center justify-center gap-2 shadow hover:bg-primary-container">
+          <span>+ Add Memory to Scrapbook</span>
+          <span>{{ T.add_memory_to_scrapbook }}</span>
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+</main>
+
+<!-- ========================================== -->
+<!-- ADD MEMORY MODAL                           -->
+<!-- ========================================== -->
+<div id="addMemoryModal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+  <div class="bg-surface rounded-2xl max-w-lg w-full p-6 sm:p-8 border border-outline-variant calm-dialogue-elevation relative max-h-[90vh] overflow-y-auto">
+    <button onclick="closeAddMemoryModal()" class="absolute top-4 right-4 text-on-surface-variant hover:text-primary">
+      <span class="material-symbols-outlined text-2xl">close</span>
+    </button>
+
+    <h2 class="font-headline font-bold text-2xl text-on-surface mb-2">
+      {{ T.modal_add_title }}
+    </h2>
+    <p class="text-sm text-on-surface-variant mb-6">
+      {{ T.modal_add_sub }}
+    </p>
+
+    <form method="POST" action="{% url 'add_memory' %}" class="space-y-4">
+      {% csrf_token %}
+
+      <div>
+        <label class="block text-xs font-bold text-on-surface uppercase mb-1">{{ T.modal_label_title }}</label>
+        <input type="text" name="title" required placeholder="e.g. Afternoon Walk by the Brahmaputra" 
+               class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary text-sm">
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-on-surface uppercase mb-1">{{ T.modal_label_period }}</label>
+          <input type="text" name="period" required placeholder="e.g. Summer 1975" 
+                 class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-on-surface uppercase mb-1">{{ T.modal_label_category }}</label>
+          <select name="tag" class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary text-sm">
+            <option value="family">{{ T.family_holidays }}</option>
+            <option value="garden">{{ T.garden_nature }}</option>
+            <option value="wedding">{{ T.wedding_romance }}</option>
+            <option value="travel">{{ T.travel_places }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-on-surface uppercase mb-1">{{ T.modal_label_location }}</label>
+        <input type="text" name="location" placeholder="e.g. Tezpur, Assam" 
+               class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary text-sm">
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-on-surface uppercase mb-1">{{ T.modal_label_desc }}</label>
+        <textarea name="description" rows="3" required placeholder="Describe the warm feeling, the smells, who was there..." 
+                  class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary text-sm"></textarea>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-on-surface uppercase mb-1">{{ T.modal_label_photo }}</label>
+        <select name="image_url" class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary text-sm">
+          <option value="/static/images/stitch/img_6d9f6639cbef.jpg">Tea Garden Blossoms & Verandah</option>
+          <option value="/static/images/stitch/img_3e85e15af82d.jpg">Cornwall Seaside Harbour</option>
+          <option value="/static/images/stitch/img_5fbd5f53370d.jpg">Family Birthday Lawn Party</option>
+          <option value="/static/images/stitch/img_28b47bd11b77.jpg">Wedding Bells & Rose Petals</option>
+          <option value="/static/images/stitch/img_3f33aedd8b33.jpg">Village Silk Weaving Loom</option>
+          <option value="/static/images/stitch/img_6d9f6639cbef.jpg">{{ T.photo_opt_tea }}</option>
+          <option value="/static/images/stitch/img_3e85e15af82d.jpg">{{ T.photo_opt_cornwall }}</option>
+          <option value="/static/images/stitch/img_5fbd5f53370d.jpg">{{ T.photo_opt_birthday }}</option>
+          <option value="/static/images/stitch/img_28b47bd11b77.jpg">{{ T.photo_opt_wedding }}</option>
+          <option value="/static/images/stitch/img_3f33aedd8b33.jpg">{{ T.photo_opt_loom }}</option>
+        </select>
+      </div>
+
+      <div class="pt-4 flex items-center justify-end gap-3">
+        <button type="button" onclick="closeAddMemoryModal()" class="px-5 py-2.5 rounded-xl border border-outline-variant text-on-surface text-sm font-semibold hover:bg-surface-container">
+          {{ T.cancel_btn }}
+        </button>
+        <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary text-on-primary text-sm font-bold shadow hover:bg-primary-container">
+          {{ T.save_memory_btn }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function openAddMemoryModal() {
+    document.getElementById('addMemoryModal').classList.remove('hidden');
+  }
+  function closeAddMemoryModal() {
+    document.getElementById('addMemoryModal').classList.add('hidden');
+  }
+
+  let currentlyPlayingBtn = null;
+  function playMemoryAudio(title, desc, btn) {
+    if (currentlyPlayingBtn === btn) {
+      window.speechSynthesis.cancel();
+      btn.querySelector('.memory-play-icon').textContent = 'play_arrow';
+      currentlyPlayingBtn = null;
+    } else {
+      if (currentlyPlayingBtn) {
+        currentlyPlayingBtn.querySelector('.memory-play-icon').textContent = 'play_arrow';
+      }
+      playGentleChime('chime');
+      btn.querySelector('.memory-play-icon').textContent = 'pause';
+      currentlyPlayingBtn = btn;
+
+      speakPageText(`Memory: ${title}. ${desc}`);
+      setTimeout(() => {
+        if (currentlyPlayingBtn === btn) {
+          btn.querySelector('.memory-play-icon').textContent = 'play_arrow';
+          currentlyPlayingBtn = null;
+        }
+      }, 10000);
+    }
+  }
+
+  let isPlayingAll = false;
+  function playAllRecordings() {
+    const icon = document.getElementById('playAllIcon');
+    if (!isPlayingAll) {
+      isPlayingAll = true;
+      icon.textContent = 'pause';
+      playGentleChime('bell');
+      speakPageText("Playing family memories album. First memory: Summers in St Ives, Cornwall. You and Arthur spent three weeks in the white cottage by the sea. Next memory: Morning tea in Tezpur garden, surrounded by blossoming pink orchids.");
+      setTimeout(() => {
+        isPlayingAll = false;
+        icon.textContent = 'record_voice_over';
+      }, 12000);
+    } else {
+      window.speechSynthesis.cancel();
+      isPlayingAll = false;
+      icon.textContent = 'record_voice_over';
+    }
+  }
+</script>
+{% endblock %}

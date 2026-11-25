@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}MindBloom — {{ T.caregiver }}{% endblock %}
+
+{% block extra_head %}
+<!-- Chart.js for Cognitive Activity Analytics -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-8">
+
+  <!-- ========================================== -->
+  <!-- PAGE HEADER & CIRCLE OF CARE               -->
+  <!-- ========================================== -->
+  <section class="bg-surface-container-lowest rounded-2xl p-6 sm:p-8 border border-outline-variant calm-card-elevation flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+    <div class="space-y-2 max-w-2xl">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-xs font-bold">
+        <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">favorite</span>
+        <span>{{ T.caregiver_circle_badge }}</span>
+      </div>
+      <h1 class="font-headline font-bold text-3xl sm:text-4xl text-on-surface tracking-tight">
+        {{ T.caregiver_page_title }}
+      </h1>
+      <p class="text-base text-on-surface-variant leading-relaxed">
+        {{ T.caregiver_page_sub }}
+      </p>
+    </div>
+
+    <!-- Family Action Triggers -->
+    <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+      <a href="{% url 'memories' %}" class="inline-flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl bg-primary text-on-primary font-bold text-sm shadow hover:bg-primary-container transition-all min-h-[52px]">
+        <span class="material-symbols-outlined text-xl">record_voice_over</span>
+        <span>{{ T.share_audio_note }}</span>
+      </a>
+      <a href="tel:5550192" class="inline-flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl bg-surface-container-lowest text-on-surface border-2 border-primary hover:bg-surface-container font-bold text-sm transition-all min-h-[52px]">
+        <span class="material-symbols-outlined text-primary text-xl">call</span>
+        <span>{{ T.call_companion }}</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- WARM STATUS & COMFORT OVERVIEW (4 Cards)   -->
+  <!-- ========================================== -->
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+    
+    <!-- Card 1: Morning Mood -->
+    <div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant calm-card-elevation flex flex-col justify-between hover:border-primary transition-all">
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="p-2.5 rounded-xl bg-secondary-container text-primary">
+            <span class="material-symbols-outlined text-2xl">light_mode</span>
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-xs font-bold">
+            <span class="w-2 h-2 rounded-full bg-primary"></span>
+            {{ latest_log.mood_score|default:"92" }}% Bright & Calm
+            {{ latest_log.mood_score|default:"92" }}% {{ T.mood_bright_calm }}
+          </span>
+        </div>
+        <h2 class="font-headline font-bold text-lg text-on-surface">{{ T.morning_mood_title }}</h2>
+      </div>
+      <p class="text-xs text-on-surface-variant pt-3 border-t border-surface-container mt-4 leading-relaxed">
+        Eleanor enjoyed cognitive memory matching after morning Assam black tea.
+        {{ T.caregiver_log_summary_1 }}
+      </p>
+    </div>
+
+    <!-- Card 2: Hydration & Daily Comfort -->
+    <div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant calm-card-elevation flex flex-col justify-between hover:border-primary transition-all">
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="p-2.5 rounded-xl bg-secondary-container text-primary">
+            <span class="material-symbols-outlined text-2xl">local_cafe</span>
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-xs font-bold">
+            <span class="material-symbols-outlined text-xs">check_circle</span>
+            Well Hydrated
+            {{ T.well_hydrated }}
+          </span>
+        </div>
+        <h2 class="font-headline font-bold text-lg text-on-surface">{{ T.hydration_comfort_title }}</h2>
+      </div>
+      <p class="text-xs text-on-surface-variant pt-3 border-t border-surface-container mt-4 leading-relaxed">
+        {{ latest_log.hydration_status|default:"4 of 5 cups chamomile & warm ginger water enjoyed." }}
+        {{ latest_log.display_hydration|default:T.caregiver_hydration_default }}
+      </p>
+    </div>
+
+    <!-- Card 3: Cherished Memories Explored -->
+    <div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant calm-card-elevation flex flex-col justify-between hover:border-primary transition-all">
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="p-2.5 rounded-xl bg-tertiary-fixed text-tertiary">
+            <span class="material-symbols-outlined text-2xl">photo_library</span>
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-fixed text-tertiary text-xs font-bold">
+            <span class="material-symbols-outlined text-xs">favorite</span>
+            {{ memories_count }} Stories
+            {{ memories_count }} {{ T.stories_count }}
+          </span>
+        </div>
+        <h2 class="font-headline font-bold text-lg text-on-surface">{{ T.memories_explored_title }}</h2>
+      </div>
+      <p class="text-xs text-on-surface-variant pt-3 border-t border-surface-container mt-4 leading-relaxed">
+        Listened to St Ives Cornwall and Tezpur tea garden audio stories today.
+        {{ T.caregiver_log_summary_2 }}
+      </p>
+    </div>
+
+    <!-- Card 4: Next Gentle Reminder -->
+    <div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant calm-card-elevation flex flex-col justify-between hover:border-primary transition-all">
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="p-2.5 rounded-xl bg-surface-container text-on-surface">
+            <span class="material-symbols-outlined text-2xl">schedule</span>
+          </span>
+          <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-container text-on-surface text-xs font-bold">
+            3:00 PM
+            {{ next_reminder.time_str|default:"3:00 PM" }}
+          </span>
+        </div>
+        <h2 class="font-headline font-bold text-lg text-on-surface">{{ T.next_reminder_title }}</h2>
+      </div>
+      <p class="text-xs text-on-surface-variant pt-3 border-t border-surface-container mt-4 leading-relaxed">
+        Afternoon chamomile tea & call with granddaughter Maya.
+        {{ next_reminder.display_title|default:T.caregiver_log_summary_3 }}
+      </p>
+    </div>
+
+  </section>
+
+  <!-- ========================================== -->
+  <!-- COGNITIVE ACTIVITY CHART (Chart.js)        -->
+  <!-- ========================================== -->
+  <section class="bg-surface-container-lowest rounded-2xl p-6 sm:p-8 border border-outline-variant calm-card-elevation space-y-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant pb-4">
+      <div>
+        <h2 class="font-headline font-bold text-2xl text-on-surface">{{ T.weekly_trend_title }}</h2>
+        <p class="text-sm text-on-surface-variant">{{ T.weekly_trend_sub }}</p>
+      </div>
+      <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-secondary-container text-primary">
+        {{ T.steady_positive_flow }}
+      </span>
+    </div>
+
+    <div class="h-64 sm:h-72 w-full pt-2">
+      <canvas id="cognitiveEngagementChart"></canvas>
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- RECENT SESSIONS & CAREGIVER NOTES          -->
+  <!-- ========================================== -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    
+    <!-- Left Column: Recent Cognitive Game Sessions (7 Cols) -->
+    <section class="lg:col-span-7 space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="font-headline font-bold text-xl text-on-surface">{{ T.recent_game_sessions }}</h2>
+        <span class="text-xs text-on-surface-variant">{{ T.saved_in_db }}</span>
+      </div>
+
+      <div class="space-y-3">
+        {% for session in game_sessions %}
+          <div class="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant calm-card-elevation flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-secondary-container flex items-center justify-center text-primary shrink-0">
+                <span class="material-symbols-outlined text-xl">
+                  {% if session.game_type == 'memory_match' %}spa
+                  {% elif session.game_type == 'sequence' %}notifications_active
+                  {% elif session.game_type == 'picture_recognition' %}yard
+                  {% elif session.game_type == 'word_recall' %}auto_stories
+                  {% else %}local_florist{% endif %}
+                </span>
+              </div>
+              <div>
+                <h3 class="font-headline font-bold text-base text-on-surface">{{ session.display_title|default:session.game_title }}</h3>
+                <p class="text-xs text-on-surface-variant">
+                  Completed on {{ session.completed_at|date:"M d, Y • h:i A" }} • {{ session.moves }} gentle turns
+                  {{ T.completed_on }} {{ session.completed_at|date:"M d, Y • h:i A" }} • {{ session.moves }} {{ T.gentle_turns_count }}
+                </p>
+              </div>
+            </div>
+
+            <div class="text-right shrink-0">
+              <span class="px-3 py-1 rounded-full bg-secondary-container text-primary font-bold text-xs">
+                {{ session.score }} pts
+                {{ session.score }} {{ T.pts }}
+              </span>
+              <div class="flex items-center justify-end gap-0.5 text-tertiary mt-1">
+                <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <p class="text-sm text-on-surface-variant">No game sessions recorded yet. Play a game to record progress!</p>
+          <p class="text-sm text-on-surface-variant">{{ T.no_game_sessions }}</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Right Column: Caregiver Notes & Form (5 Cols) -->
+    <section class="lg:col-span-5 space-y-6">
+      
+      <!-- Caregiver Daily Note Form -->
+      <div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant calm-card-elevation space-y-4">
+        <h3 class="font-headline font-bold text-lg text-on-surface">{{ T.record_observation }}</h3>
+        <p class="text-xs text-on-surface-variant">{{ T.observation_sub }}</p>
+
+        <form method="POST" action="{% url 'caregiver' %}" class="space-y-3">
+          {% csrf_token %}
+          <div>
+            <label class="block text-xs font-bold text-on-surface uppercase mb-1">{{ T.label_mood }}</label>
+            <select name="mood" class="w-full px-3 py-2 rounded-xl border border-outline-variant bg-surface-container-low text-sm">
+              <option value="Bright & Peaceful (Sunny disposition)">Bright & Peaceful (Sunny disposition)</option>
+              <option value="Gentle & Content">Gentle & Content</option>
+              <option value="Quiet & Reflective">Quiet & Reflective</option>
+              <option value="Restful & Relaxed">Restful & Relaxed</option>
+              <option value="Bright & Peaceful (Sunny disposition)">{{ T.mood_opt_bright }}</option>
+              <option value="Gentle & Content">{{ T.mood_opt_gentle }}</option>
+              <option value="Quiet & Reflective">{{ T.mood_opt_quiet }}</option>
+              <option value="Restful & Relaxed">{{ T.mood_opt_restful }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-on-surface uppercase mb-1">{{ T.label_hydration }}</label>
+            <input type="text" name="hydration" value="4 of 5 cups chamomile & warm ginger water" class="w-full px-3 py-2 rounded-xl border border-outline-variant bg-surface-container-low text-sm">
+            <input type="text" name="hydration" value="{{ T.caregiver_hydration_default }}" class="w-full px-3 py-2 rounded-xl border border-outline-variant bg-surface-container-low text-sm">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-on-surface uppercase mb-1">{{ T.label_note }}</label>
+            <textarea name="notes" rows="3" placeholder="e.g. Eleanor laughed recalling her wedding flowers..." class="w-full px-3 py-2 rounded-xl border border-outline-variant bg-surface-container-low text-sm"></textarea>
+          </div>
+
+          <button type="submit" class="w-full py-3 rounded-xl bg-primary text-on-primary font-bold text-sm shadow hover:bg-primary-container">
+            {{ T.save_note_btn }}
+          </button>
+        </form>
+      </div>
+
+      <!-- Past Notes Log -->
+      <div class="bg-surface-container-low p-6 rounded-2xl border border-outline-variant space-y-3">
+        <h4 class="font-headline font-bold text-base text-on-surface">{{ T.recent_logs }}</h4>
+        {% for log in caregiver_logs %}
+          <div class="p-3 bg-surface rounded-xl border border-outline-variant space-y-1">
+            <div class="flex items-center justify-between text-xs text-on-surface-variant">
+              <span class="font-bold text-primary">{{ log.caregiver.first_name|default:"Sarah" }}</span>
+              <span>{{ log.date|date:"M d, Y" }}</span>
+            </div>
+            <p class="text-xs text-on-surface font-semibold">{{ log.mood }}</p>
+            <p class="text-xs text-on-surface font-semibold">{{ log.display_mood|default:log.mood }}</p>
+            {% if log.notes %}
+              <p class="text-xs text-on-surface-variant italic leading-relaxed">"{{ log.notes }}"</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+    </section>
+
+  </div>
+
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Chart.js Weekly Engagement Trend
+  document.addEventListener('DOMContentLoaded', () => {
+    const ctx = document.getElementById('cognitiveEngagementChart');
+    if (ctx) {
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Thursday', 'Friday', 'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Today (Wednesday)'],
+          labels: {{ chart_days_json|safe|default:"['Thursday', 'Friday', 'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Today (Wednesday)']" }},
+          datasets: [{
+            label: '{{ T.chart_engagement_label }}',
+            data: [85, 90, 88, 92, 95, 90, 96],
+            borderColor: '#3b5341',
+            backgroundColor: 'rgba(214, 232, 205, 0.4)',
+            fill: true,
+            tension: 0.35,
+            borderWidth: 3,
+            pointBackgroundColor: '#3b5341',
+            pointRadius: 5
+          }, {
+            label: '{{ T.chart_minutes_label }}',
+            data: [12, 15, 10, 18, 14, 15, 20],
+            borderColor: '#c98970',
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            borderDash: [5, 5],
+            pointBackgroundColor: '#c98970',
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                font: {
+                  family: 'Plus Jakarta Sans',
+                  size: 12
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: 0,
+              max: 100,
+              grid: {
+                color: 'rgba(195, 200, 193, 0.3)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,452 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Memory Match: Morning Flora & Familiar Keepsakes — MindBloom{% endblock %}
+
+{% block extra_head %}
+<style>
+  .custom-match-glow {
+    box-shadow: 0 0 16px rgba(83, 107, 88, 0.25);
+  }
+  .card-flip {
+    perspective: 1000px;
+    cursor: pointer;
+  }
+  .card-inner {
+    transition: transform 0.4s ease;
+    transform-style: preserve-3d;
+  }
+  .card-flip.is-flipped .card-inner {
+    transform: rotateY(180deg);
+  }
+  .card-front, .card-back {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .card-back {
+    transform: rotateY(180deg);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-8 py-8 flex flex-col items-center space-y-6">
+
+  <!-- ========================================== -->
+  <!-- Top Bar Back to Games & Reassurance        -->
+  <!-- ========================================== -->
+  <div class="w-full flex flex-wrap items-center justify-between gap-4">
+    <a href="{% url 'games_library' %}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-semibold text-base transition-colors border border-outline-variant">
+      <span class="material-symbols-outlined text-primary text-xl">arrow_back</span>
+      <span>{{ T.back_to_games }}</span>
+    </a>
+
+    <div class="flex items-center gap-3">
+      <!-- Ambience Button -->
+      <button onclick="toggleGardenAmbience(this)" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-sm border border-outline-variant transition-colors">
+        <span class="material-symbols-outlined text-primary text-xl" id="ambienceIcon">nature</span>
+        <span class="font-medium" id="ambienceText">{{ T.soft_birds_flute }}</span>
+      </button>
+
+      <!-- Pause Game -->
+      <button onclick="togglePauseGame()" id="pauseBtn" class="min-h-[46px] px-5 rounded-xl bg-surface-container-lowest border border-outline-variant text-on-surface font-semibold text-sm flex items-center gap-2 hover:bg-surface-container transition-colors">
+        <span class="material-symbols-outlined text-xl" id="pauseIcon">pause_circle</span>
+        <span id="pauseText">{{ T.pause }}</span>
+      </button>
+
+      <!-- Restart Shuffle -->
+      <button onclick="initMemoryGame()" class="min-h-[46px] px-5 rounded-xl bg-surface-container-lowest border border-outline-variant text-on-surface font-semibold text-sm flex items-center gap-2 hover:bg-surface-container transition-colors">
+        <span class="material-symbols-outlined text-xl">refresh</span>
+        <span>{{ T.restart }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Title & Gentle Comfort Instructions -->
+  <div class="w-full text-center max-w-3xl space-y-3">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary-container text-on-secondary-container text-xs font-bold">
+      <span class="material-symbols-outlined text-base" style="font-variation-settings: 'FILL' 1;">spa</span>
+      <span>{{ T.peaceful_mind_routine }}</span>
+    </div>
+    <h1 class="font-headline font-bold text-3xl sm:text-4xl text-on-surface">
+      {{ T.game_memory_match_title }}
+    </h1>
+    <p class="text-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
+      {{ T.find_two_matching }}
+    </p>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- Calm Status Bar                            -->
+  <!-- ========================================== -->
+  <section aria-label="Game Progress & Controls" class="w-full max-w-5xl bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 calm-card-elevation flex flex-col lg:flex-row items-center justify-between gap-6">
+    
+    <!-- Completed Badges Cluster -->
+    <div class="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+        <div>
+          <div class="font-headline font-bold text-xl text-on-surface" id="pairsFoundText">{{ T.pairs_found }}: 0 {{ T.of_six }}</div>
+          <div class="text-xs text-on-surface-variant" id="pairsFoundStatus">{{ T.take_breath_first_card }}</div>
+        </div>
+      </div>
+      <!-- Botanical badges found -->
+      <div class="flex flex-wrap items-center gap-2 pt-1 sm:pt-0" id="matchedBadgesContainer">
+        <!-- Badges added dynamically -->
+      </div>
+    </div>
+
+    <!-- Gentle Turns & Buttons -->
+    <div class="flex flex-wrap items-center justify-center lg:justify-end gap-4 w-full lg:w-auto">
+      <!-- Turns Pill -->
+      <div class="px-5 py-2.5 rounded-xl bg-surface-container-low border border-outline-variant text-center">
+        <span class="block text-xs text-on-surface-variant">{{ T.gentle_pace }}</span>
+        <span class="font-headline font-bold text-lg text-primary" id="turnsCounter">{{ T.gentle_turns }}: 0</span>
+      </div>
+      
+      <!-- Timer Pill -->
+      <div class="px-5 py-2.5 rounded-xl bg-surface-container-low border border-outline-variant text-center">
+        <span class="block text-xs text-on-surface-variant">{{ T.time_spent }}</span>
+        <span class="font-headline font-bold text-lg text-primary" id="timerDisplay">00:00</span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Card States Legend -->
+  <div class="w-full max-w-5xl bg-surface-container-low border border-outline-variant rounded-xl p-3.5 flex flex-wrap items-center justify-around gap-4 text-xs text-on-surface-variant">
+    <div class="flex items-center gap-2">
+      <div class="w-6 h-6 rounded-lg bg-surface border border-outline-variant flex items-center justify-center text-primary">
+        <span class="material-symbols-outlined text-xs">spa</span>
+      </div>
+      <span>{{ T.face_down }}</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="w-6 h-6 rounded-lg bg-[#FAF3E3] border border-outline flex items-center justify-center text-[#6E5523]">
+        <span class="material-symbols-outlined text-xs">visibility</span>
+      </div>
+      <span>{{ T.looking_for_pair }}</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="w-6 h-6 rounded-lg bg-secondary-container border border-primary flex items-center justify-center text-primary">
+        <span class="material-symbols-outlined text-xs">check</span>
+      </div>
+      <span>{{ T.matched_pair }}</span>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- Active 4x3 Grid of 12 Tactile Cards        -->
+  <!-- ========================================== -->
+  <section aria-label="Memory Matching Grid" class="w-full max-w-5xl mb-10">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6" id="cardsGrid">
+      <!-- Generated via JS -->
+    </div>
+  </section>
+
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // 12 Card Data (6 pairs) matching North Eastern botanical & tea garden items
+  const CARD_ITEMS = [
+    {
+      id: 'orchid',
+      name: tr('orchid', 'Foxtail Orchid'),
+      subtitle: tr('orchid_sub', '(Kopou Phool)'),
+      icon: 'local_florist',
+      image: "{% static 'images/stitch/img_d3895554d69e.jpg' %}",
+      badgeBg: 'bg-[#EAF0E8]',
+      badgeText: 'text-[#3D5241]',
+      badgeBorder: 'border-[#A8B9A0]'
+    },
+    {
+      id: 'kahi',
+      name: tr('kahi', 'Bell Metal Bowl'),
+      subtitle: tr('kahi_sub', '(Traditional Kahi)'),
+      icon: 'coffee',
+      image: "{% static 'images/stitch/img_160c63a14e64.jpg' %}",
+      badgeBg: 'bg-[#FAF3E3]',
+      badgeText: 'text-[#6E5523]',
+      badgeBorder: 'border-[#DFD6BF]'
+    },
+    {
+      id: 'teacup',
+      name: tr('teacup', 'Ceramic Teacup'),
+      subtitle: tr('teacup_sub', '(Morning Assam Tea)'),
+      icon: 'local_cafe',
+      image: "{% static 'images/stitch/img_6c2fd3b00ae1.jpg' %}",
+      badgeBg: 'bg-[#F9EFEA]',
+      badgeText: 'text-[#7D4735]',
+      badgeBorder: 'border-[#E8C5B8]'
+    },
+    {
+      id: 'bell',
+      name: tr('bell', 'Brass Temple Bell'),
+      subtitle: tr('bell_sub', '(Awakening Chime)'),
+      icon: 'notifications_active',
+      image: "{% static 'images/stitch/img_601feb6f7e0c.jpg' %}",
+      badgeBg: 'bg-[#FAF3E3]',
+      badgeText: 'text-[#6E5523]',
+      badgeBorder: 'border-[#DFD6BF]'
+    },
+    {
+      id: 'jasmine',
+      name: tr('jasmine', 'Star Jasmine'),
+      subtitle: tr('jasmine_sub', '(Garden Blossom)'),
+      icon: 'filter_vintage',
+      image: "{% static 'images/stitch/img_6a2c31e896b4.jpg' %}",
+      badgeBg: 'bg-[#EAF0E8]',
+      badgeText: 'text-[#3D5241]',
+      badgeBorder: 'border-[#A8B9A0]'
+    },
+    {
+      id: 'basket',
+      name: tr('basket', 'Woven Cane Basket'),
+      subtitle: tr('basket_sub', '(Handcrafted Reed)'),
+      icon: 'shopping_basket',
+      image: "{% static 'images/stitch/img_44d64d376a7b.jpg' %}",
+      badgeBg: 'bg-[#FAF3E3]',
+      badgeText: 'text-[#6E5523]',
+      badgeBorder: 'border-[#DFD6BF]'
+    }
+  ];
+
+  let deck = [];
+  let flippedCards = [];
+  let matchedPairs = 0;
+  let turns = 0;
+  let gamePaused = false;
+  let gameTimer = null;
+  let secondsElapsed = 0;
+
+  function shuffle(array) {
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex != 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+      [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+    return array;
+  }
+
+  function initMemoryGame() {
+    clearInterval(gameTimer);
+    secondsElapsed = 0;
+    matchedPairs = 0;
+    turns = 0;
+    flippedCards = [];
+    gamePaused = false;
+
+    document.getElementById('turnsCounter').textContent = `${tr('gentle_turns', 'Gentle Turns')}: 0`;
+    document.getElementById('pairsFoundText').textContent = `${tr('pairs_found', 'Pairs Found')}: 0 ${tr('of_six', 'of 6')}`;
+    document.getElementById('pairsFoundStatus').textContent = tr('take_breath_first_card', 'Take a breath and turn your first card');
+    document.getElementById('matchedBadgesContainer').innerHTML = '';
+    document.getElementById('timerDisplay').textContent = `00:00`;
+
+    // Duplicate cards to form 6 pairs (12 total)
+    deck = [];
+    CARD_ITEMS.forEach(item => {
+      deck.push({ ...item, uid: item.id + '_a' });
+      deck.push({ ...item, uid: item.id + '_b' });
+    });
+    shuffle(deck);
+
+    const grid = document.getElementById('cardsGrid');
+    grid.innerHTML = '';
+
+    deck.forEach((card, index) => {
+      const cardEl = document.createElement('div');
+      cardEl.className = 'card-flip min-h-[220px] sm:min-h-[240px]';
+      cardEl.dataset.id = card.id;
+      cardEl.dataset.uid = card.uid;
+      cardEl.dataset.index = index;
+
+      cardEl.innerHTML = `
+        <div class="card-inner relative w-full h-full min-h-[220px] sm:min-h-[240px]">
+          <!-- Card Front: Face Down -->
+          <button type="button" class="card-front absolute inset-0 w-full h-full bg-[#FFFDF9] hover:bg-surface-container border border-outline-variant rounded-2xl p-4 flex flex-col items-center justify-center calm-card-elevation transition-all group focus:ring-4 focus:ring-secondary-container">
+            <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-3 group-hover:scale-105 transition-transform text-primary">
+              <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">spa</span>
+            </div>
+            <span class="font-headline font-semibold text-sm text-on-surface">Card ${index + 1}</span>
+            <span class="text-xs font-semibold text-primary mt-2 flex items-center gap-1 bg-[#EAF0E8] px-3 py-1 rounded-full">
+              <span class="material-symbols-outlined text-sm">touch_app</span>
+              <span>${tr('tap_to_turn', 'Tap to Turn')}</span>
+            </span>
+          </button>
+
+          <!-- Card Back: Flipped Image -->
+          <div class="card-back absolute inset-0 w-full h-full bg-[#FFFDF9] border-2 border-outline-variant rounded-2xl p-4 flex flex-col items-center justify-between calm-card-elevation">
+            <div class="w-full flex items-center justify-between">
+              <span class="match-badge inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FAF3E3] text-[#6E5523] text-xs font-bold">
+                <span class="material-symbols-outlined text-sm">visibility</span>
+                <span class="badge-text">${tr('looking_for_pair', 'Looking for pair')}</span>
+              </span>
+              <span class="material-symbols-outlined text-outline-variant text-lg">favorite</span>
+            </div>
+            <div class="w-full flex-grow flex items-center justify-center py-2">
+              <img src="${card.image}" alt="${card.name}" class="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-xl">
+            </div>
+            <div class="text-center">
+              <p class="font-headline font-bold text-sm sm:text-base text-primary">${card.name}</p>
+              <span class="text-xs text-on-surface-variant font-medium">${card.subtitle}</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      cardEl.addEventListener('click', () => handleCardClick(cardEl, card));
+      grid.appendChild(cardEl);
+    });
+
+    // Start gentle timer
+    gameTimer = setInterval(() => {
+      if (!gamePaused) {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        document.getElementById('timerDisplay').textContent = `${mins}:${secs}`;
+      }
+    }, 1000);
+  }
+
+  function handleCardClick(cardEl, card) {
+    if (gamePaused) return;
+    if (cardEl.classList.contains('is-flipped') || cardEl.classList.contains('is-matched')) return;
+    if (flippedCards.length >= 2) return;
+
+    // Flip card
+    playGentleChime('tap');
+    cardEl.classList.add('is-flipped');
+    flippedCards.push({ el: cardEl, data: card });
+
+    if (flippedCards.length === 2) {
+      turns++;
+      document.getElementById('turnsCounter').textContent = `${tr('gentle_turns', 'Gentle Turns')}: ${turns}`;
+      checkMatch();
+    }
+  }
+
+  function checkMatch() {
+    const [card1, card2] = flippedCards;
+    if (card1.data.id === card2.data.id) {
+      // Match found!
+      playGentleChime('bell');
+      card1.el.classList.add('is-matched');
+      card2.el.classList.add('is-matched');
+
+      // Update card border to matched style
+      [card1.el, card2.el].forEach(c => {
+        const back = c.querySelector('.card-back');
+        back.classList.remove('border-outline-variant');
+        back.classList.add('border-primary', 'custom-match-glow');
+        const badge = back.querySelector('.match-badge');
+        badge.className = 'match-badge inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-container text-primary text-xs font-bold';
+        badge.innerHTML = `<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check</span> ${tr('match_found', 'Match found!')}`;
+      });
+
+      matchedPairs++;
+      document.getElementById('pairsFoundText').textContent = `${tr('pairs_found', 'Pairs Found')}: ${matchedPairs} ${tr('of_six', 'of 6')}`;
+      
+      if (matchedPairs === 3) {
+        document.getElementById('pairsFoundStatus').textContent = tr('halfway_garden', 'Halfway through this tranquil garden!');
+      } else if (matchedPairs === 6) {
+        document.getElementById('pairsFoundStatus').textContent = tr('all_pairs_bloomed', 'All peaceful pairs bloomed! Wonderful work.');
+      }
+
+      // Add badge to header
+      const badgeContainer = document.getElementById('matchedBadgesContainer');
+      const item = card1.data;
+      const bEl = document.createElement('span');
+      bEl.className = `inline-flex items-center gap-1.5 px-3 py-1 rounded-full ${item.badgeBg} ${item.badgeText} text-xs font-bold border ${item.badgeBorder} animate-in fade-in`;
+      bEl.innerHTML = `<span class="material-symbols-outlined text-sm">${item.icon}</span> <span>${item.name}</span>`;
+      badgeContainer.appendChild(bEl);
+
+      flippedCards = [];
+
+      if (matchedPairs === 6) {
+        setTimeout(handleGameComplete, 1200);
+      }
+    } else {
+      // Non matching - gentle reset
+      setTimeout(() => {
+        card1.el.classList.remove('is-flipped');
+        card2.el.classList.remove('is-flipped');
+        flippedCards = [];
+      }, 1000);
+    }
+  }
+
+  function handleGameComplete() {
+    clearInterval(gameTimer);
+    playGentleChime('celebration');
+
+    const score = Math.max(80, 100 - (turns - 6) * 3);
+    const duration = secondsElapsed;
+
+    // Save game session to SQLite via AJAX
+    fetch('/api/save-game/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({
+        game_type: 'memory_match',
+        game_title: 'Memory Match: Morning Flora & Familiar Keepsakes',
+        score: score,
+        moves: turns,
+        mistakes: Math.max(0, turns - 6),
+        pairs_found: 6,
+        duration_seconds: duration,
+        stars: 3,
+        notes: `Completed in ${turns} gentle turns with 6 peaceful pairs found.`
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      // Transition smoothly to celebration screen
+      window.location.href = `{% url 'game_completion' %}?game=memory_match&session_id=${data.session_id || ''}`;
+    })
+    .catch(err => {
+      console.log("Save game session error:", err);
+      window.location.href = "{% url 'game_completion' %}?game=memory_match";
+    });
+  }
+
+  function togglePauseGame() {
+    gamePaused = !gamePaused;
+    const icon = document.getElementById('pauseIcon');
+    const txt = document.getElementById('pauseText');
+    if (gamePaused) {
+      icon.textContent = 'play_circle';
+      txt.textContent = 'Resume Game';
+    } else {
+      icon.textContent = 'pause_circle';
+      txt.textContent = 'Pause Game';
+    }
+  }
+
+  let ambiencePlaying = false;
+  function toggleGardenAmbience(btn) {
+    ambiencePlaying = !ambiencePlaying;
+    const txt = document.getElementById('ambienceText');
+    const icon = document.getElementById('ambienceIcon');
+    if (ambiencePlaying) {
+      playGentleChime('bell');
+      txt.textContent = 'Morning Birds & Flute — Playing softly';
+      icon.textContent = 'volume_up';
+      btn.classList.add('bg-secondary-container');
+    } else {
+      txt.textContent = 'Soft Morning Birds & Flute — Muted';
+      icon.textContent = 'volume_off';
+      btn.classList.remove('bg-secondary-container');
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', initMemoryGame);
+</script>
+{% endblock %}

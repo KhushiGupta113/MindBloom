@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}MindBloom — {{ T.well_done }}{% endblock %}
+
+{% block extra_head %}
+<style>
+  .deep-comfort-shadow {
+    box-shadow: 0 16px 36px -4px rgba(83, 73, 56, 0.08), 0 6px 16px -2px rgba(83, 73, 56, 0.04);
+  }
+
+  .waveform-bar {
+    transition: height 0.3s ease;
+  }
+
+  @keyframes gentlePulse {
+
+    0%,
+    100% {
+      opacity: 0.85;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 1;
+      transform: scale(1.02);
+    }
+  }
+
+  .gentle-presence {
+    animation: gentlePulse 6s ease-in-out infinite;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-grow w-full max-w-5xl mx-auto px-4 sm:px-8 py-8 sm:py-12 flex flex-col items-center space-y-8">
+
+  <!-- Gentle Status Banner -->
+  <div
+    class="flex items-center gap-3 px-6 py-2.5 bg-surface-container rounded-full border border-outline-variant/60 shadow-sm">
+    <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">yard</span>
+    <span class="text-sm font-semibold text-on-surface-variant">{{ T.garden_walk_finished }}</span>
+  </div>
+
+  <!-- The Paper Sanctuary Completion Card -->
+  <article
+    class="w-full bg-surface-container-lowest rounded-2xl border border-outline-variant deep-comfort-shadow overflow-hidden p-6 sm:p-10 md:p-12 transition-all space-y-10">
+
+    <!-- Top Celebration Header & Botanical Illustration -->
+    <div class="flex flex-col md:flex-row items-center gap-8 md:gap-10 pb-8 border-b border-surface-container-high">
+
+      <!-- Watercolor illustration -->
+      <div
+        class="relative w-44 h-44 sm:w-52 sm:h-52 shrink-0 rounded-2xl overflow-hidden border-4 border-surface-bright shadow bg-surface-container-low">
+        <img src="{% static 'images/stitch/img_838ed0438470.jpg' %}"
+          alt="Watercolor jasmine blossoms and tea leaves in Assam sunrise" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-primary/5 pointer-events-none rounded-2xl"></div>
+      </div>
+
+      <!-- Dignified Headline & Subtitle -->
+      <div class="text-center md:text-left flex-1 space-y-3">
+        <div
+          class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-secondary-container text-on-secondary-container text-xs font-bold">
+          <span class="material-symbols-outlined text-base"
+            style="font-variation-settings: 'FILL' 1;">check_circle</span>
+          <span>{{ T.completed_with_care }}</span>
+        </div>
+        <h1 class="font-headline font-bold text-3xl sm:text-4xl text-on-surface tracking-tight leading-tight">
+          {{ T.well_done }}
+        </h1>
+        <p class="text-lg text-on-surface-variant leading-relaxed max-w-2xl font-body">
+          {{ T.well_done_desc }}
+        </p>
+        <div
+          class="pt-1 flex flex-wrap items-center justify-center md:justify-start gap-3 text-sm text-on-surface-variant font-medium">
+          <span class="inline-flex items-center gap-1.5 text-secondary">
+            <span class="material-symbols-outlined text-lg">wb_sunny</span>
+            <span>Jasmine & Morning Light</span>
+            <span>{{ T.jasmine_morning_light }}</span>
+          </span>
+          <span>•</span>
+          <span>Tea Garden Serenity</span>
+          <span>{{ T.tea_garden_serenity }}</span>
+          <span>•</span>
+          <span class="text-primary font-bold">100% Engagement</span>
+          <span class="text-primary font-bold">{{ T.engagement_100 }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 3 Summary Comfort Cards -->
+    <section aria-label="Summary of your gentle morning time" class="space-y-4">
+      <div class="text-center md:text-left">
+        <h2 class="font-headline font-bold text-2xl text-on-surface">{{ T.morning_rhythm_heading }}</h2>
+        <p class="text-base text-on-surface-variant">{{ T.morning_rhythm_sub }}</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Card 1: Moments of Joy -->
+        <div
+          class="bg-surface-container-low rounded-2xl p-6 border border-outline-variant calm-card-elevation flex flex-col justify-between space-y-4">
+          <div>
+            <div
+              class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-primary mb-3">
+              <span class="material-symbols-outlined text-2xl"
+                style="font-variation-settings: 'FILL' 1;">favorite</span>
+            </div>
+            <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1">{{ T.moments_of_joy }}</p>
+            <h3 class="font-headline font-bold text-2xl text-on-surface mb-2">
+              {{ session.pairs_found|default:"6" }} {{ T.peaceful_keepsakes }}
+            </h3>
+            <p class="text-sm text-on-surface-variant leading-relaxed font-body">
+              {{ T.keepsakes_summary }}
+            </p>
+          </div>
+          <div
+            class="pt-3 border-t border-surface-container flex items-center gap-2 text-primary text-xs font-semibold">
+            <span class="material-symbols-outlined text-base">filter_vintage</span>
+            <span>Gentle floral memory</span>
+            <span>{{ T.gentle_floral_memory }}</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Time in Calm Flow -->
+        <div
+          class="bg-surface-container-low rounded-2xl p-6 border border-outline-variant calm-card-elevation flex flex-col justify-between space-y-4">
+          <div>
+            <div class="w-12 h-12 rounded-full bg-[#FAF3E3] flex items-center justify-center text-[#6E5523] mb-3">
+              <span class="material-symbols-outlined text-2xl"
+                style="font-variation-settings: 'FILL' 1;">schedule</span>
+            </div>
+            <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1">{{ T.time_in_calm_flow }}</p>
+            <h3 class="font-headline font-bold text-2xl text-on-surface mb-2">
+              {{ T.unhurried_minutes }}
+            </h3>
+            <p class="text-sm text-on-surface-variant leading-relaxed font-body">
+              {{ T.unhurried_sub }}
+            </p>
+          </div>
+          <div
+            class="pt-3 border-t border-surface-container flex items-center gap-2 text-[#6E5523] text-xs font-semibold">
+            <span class="material-symbols-outlined text-base">spa</span>
+            <span>No clocks, no pressure</span>
+            <span>{{ T.no_clocks_no_pressure }}</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Mind State -->
+        <div
+          class="bg-surface-container-low rounded-2xl p-6 border border-outline-variant calm-card-elevation flex flex-col justify-between space-y-4">
+          <div>
+            <div
+              class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-primary mb-3">
+              <span class="material-symbols-outlined text-2xl"
+                style="font-variation-settings: 'FILL' 1;">sentiment_very_satisfied</span>
+            </div>
+            <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1">{{ T.mind_state }}</p>
+            <h3 class="font-headline font-bold text-2xl text-on-surface mb-2">
+              {{ T.relaxed_centered }}
+            </h3>
+            <p class="text-sm text-on-surface-variant leading-relaxed font-body">
+              {{ T.steady_breathing }}
+            </p>
+          </div>
+          <div
+            class="pt-3 border-t border-surface-container flex items-center gap-2 text-primary text-xs font-semibold">
+            <span class="material-symbols-outlined text-base">self_improvement</span>
+            <span>Content & peaceful</span>
+            <span>{{ T.content_peaceful }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Personal Family Connection: Daughter Sarah's Note & Voice Audio -->
+    <section aria-label="Family update from daughter Sarah"
+      class="p-6 sm:p-8 rounded-2xl bg-surface-container-high border border-outline-variant relative overflow-hidden">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+
+        <!-- Sarah's Portrait & Note -->
+        <div class="flex items-start gap-4 sm:gap-5">
+          <div
+            class="relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-surface-bright shadow bg-surface-container">
+            <img src="{% static 'images/stitch/img_570dff029353.jpg' %}" alt="Sarah with Eleanor"
+              class="w-full h-full object-cover">
+            <div class="absolute bottom-1 right-1 w-3.5 h-3.5 bg-primary rounded-full border-2 border-surface-bright">
+            </div>
+          </div>
+          <div class="space-y-1 max-w-xl">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-primary">{{ T.daughter_sarah }}</span>
+              <span
+                class="px-2.5 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed text-xs font-semibold">Connected
+                5m ago</span>
+                class="px-2.5 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed text-xs font-semibold">{{ T.connected_5m_ago }}</span>
+            </div>
+            <p class="text-sm text-on-surface-variant">
+              {{ T.sarah_notified }}
+            </p>
+            <blockquote class="font-headline text-lg sm:text-xl text-on-surface italic mt-1 font-normal">
+              {{ T.sarah_completion_quote }}
+            </blockquote>
+          </div>
+        </div>
+
+        <!-- Interactive Voice Note Player -->
+        <div class="w-full md:w-auto shrink-0 flex flex-col items-stretch sm:items-end gap-2">
+          <button onclick="playSarahVoiceNote()"
+            class="w-full sm:w-auto min-h-[56px] px-6 py-3.5 bg-surface-bright border-2 border-primary text-on-surface rounded-xl hover:bg-surface-container-low transition-all flex items-center justify-center gap-4 shadow cursor-pointer group"
+            id="voiceNoteBtn">
+            <div
+              class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary group-hover:scale-105 transition-transform">
+              <span class="material-symbols-outlined text-2xl" id="sarahPlayIcon"
+                style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+            </div>
+            <div class="text-left">
+              <div class="font-semibold text-primary text-base">{{ T.listen_sarah_voice }}</div>
+              <div class="text-xs text-on-surface-variant flex items-center gap-2">
+                <span>0:24</span>
+                <span>•</span>
+                <span>{{ T.recorded_with_love }}</span>
+              </div>
+            </div>
+            <!-- Waveform bars -->
+            <div class="hidden sm:flex items-center gap-1 h-6 pl-2" id="waveformBars">
+              <span class="waveform-bar w-1 bg-primary/40 rounded-full h-3"></span>
+              <span class="waveform-bar w-1 bg-primary/70 rounded-full h-5"></span>
+              <span class="waveform-bar w-1 bg-primary rounded-full h-6"></span>
+              <span class="waveform-bar w-1 bg-primary/60 rounded-full h-4"></span>
+              <span class="waveform-bar w-1 bg-primary/80 rounded-full h-5"></span>
+              <span class="waveform-bar w-1 bg-primary/30 rounded-full h-2"></span>
+            </div>
+          </button>
+          <span class="text-xs text-on-surface-variant text-center sm:text-right">Tapping will play softly through your
+            speaker</span>
+          <span class="text-xs text-on-surface-variant text-center sm:text-right">{{ T.tapping_speaker_note }}</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Primary Action Controls -->
+    <section aria-label="Next steps"
+      class="pt-6 border-t border-surface-container-high flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4">
+      <a href="{% if game_name == 'sequence' %}{% url 'sequence_game' %}{% elif game_name == 'picture_recognition' %}{% url 'picture_recognition' %}{% elif game_name == 'word_recall' %}{% url 'word_recall' %}{% elif game_name == 'gentle_garden' %}{% url 'garden_game' %}{% else %}{% url 'memory_match' %}{% endif %}"
+        class="min-h-[56px] px-8 py-3.5 bg-primary hover:bg-primary-container text-on-primary font-bold text-base rounded-xl flex items-center justify-center gap-3 shadow transition-colors">
+        <span class="material-symbols-outlined text-2xl">replay</span>
+        <span>{{ T.play_again }}</span>
+      </a>
+
+      <a href="{% url 'games_library' %}"
+        class="min-h-[56px] px-8 py-3.5 bg-surface-container-lowest text-on-surface border-2 border-primary font-bold text-base rounded-xl hover:bg-surface-container transition-colors flex items-center justify-center gap-3">
+        <span class="material-symbols-outlined text-2xl">grid_view</span>
+        <span>{{ T.back_to_games }}</span>
+      </a>
+
+      <a href="{% url 'home' %}"
+        class="min-h-[56px] px-8 py-3.5 bg-surface-container-high text-on-surface font-bold text-base rounded-xl hover:bg-surface-container-highest transition-colors flex items-center justify-center gap-3 border border-outline-variant">
+        <span class="material-symbols-outlined text-2xl">cottage</span>
+        <span>{{ T.back_to_home }}</span>
+      </a>
+    </section>
+
+    <div class="text-center pt-2">
+      <p class="text-sm text-on-surface-variant italic">
+        {{ T.everything_saved_auto }}
+      </p>
+    </div>
+
+  </article>
+
+  <!-- Ambient Recommendation Card: Warm Morning Tea -->
+  <div
+    class="w-full max-w-5xl bg-surface-container-low rounded-2xl p-6 sm:p-8 border border-outline-variant calm-card-elevation flex flex-col sm:flex-row items-center justify-between gap-6">
+    <div class="flex items-center gap-4">
+      <div
+        class="w-14 h-14 rounded-full bg-surface-bright border border-outline-variant flex items-center justify-center text-primary shrink-0 shadow-sm">
+        <span class="material-symbols-outlined text-3xl">local_cafe</span>
+      </div>
+      <div>
+        <h4 class="font-headline font-bold text-xl text-on-surface">{{ T.warm_tea_title }}</h4>
+        <p class="text-sm text-on-surface-variant">{{ T.warm_tea_sub }}</p>
+      </div>
+    </div>
+    <a href="{% url 'home' %}#reminders-section"
+      class="shrink-0 min-h-[48px] px-6 py-2.5 bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant text-on-surface font-semibold text-sm rounded-full transition-colors flex items-center gap-2">
+      <span class="material-symbols-outlined text-lg">task_alt</span>
+      <span>{{ T.set_reminder }}</span>
+    </a>
+  </div>
+
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  let isSarahPlaying = false;
+  function playSarahVoiceNote() {
+    const icon = document.getElementById('sarahPlayIcon');
+    if (!isSarahPlaying) {
+      isSarahPlaying = true;
+      if (icon) icon.textContent = 'pause';
+      playGentleChime('chime');
+      speakPageText("You are doing so wonderfully, Ma! I saw you finished your morning activity with such peace. I will call you during afternoon tea time at three o'clock. Drink some warm water and enjoy the morning sunshine!");
+      setTimeout(() => {
+        isSarahPlaying = false;
+        if (icon) icon.textContent = 'play_arrow';
+      }, 9000);
+    } else {
+      window.speechSynthesis.cancel();
+      isSarahPlaying = false;
+      if (icon) icon.textContent = 'play_arrow';
+    }
+  }
+
+  // Play celebration sound when page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    playGentleChime('celebration');
+  });
+</script>
+{% endblock %}

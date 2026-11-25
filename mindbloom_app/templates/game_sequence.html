@@ -1,0 +1,348 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Remember the Sequence: Morning Chimes — MindBloom{% endblock %}
+
+{% block extra_head %}
+<style>
+  .honey-glow {
+    box-shadow: 0 0 20px rgba(201, 137, 112, 0.4);
+    border-color: #c98970 !important;
+  }
+  .active-play-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-grow w-full max-w-[1080px] mx-auto px-4 sm:px-8 py-8 flex flex-col gap-6">
+
+  <!-- ========================================== -->
+  <!-- Header / Navigation Bar                    -->
+  <!-- ========================================== -->
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <a href="{% url 'games_library' %}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-semibold text-base transition-colors border border-outline-variant">
+      <span class="material-symbols-outlined text-primary text-xl">arrow_back</span>
+      <span>{{ T.back_to_games }}</span>
+    </a>
+
+    <div class="flex items-center gap-3">
+      <button onclick="playSequenceDemo()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-container hover:bg-surface-container-high border border-outline-variant text-on-surface text-sm transition-colors">
+        <span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">volume_up</span>
+        <span class="font-medium">{{ T.audio_chime_helper }}</span>
+      </button>
+
+      <button onclick="initSequenceGame()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-container-lowest border border-outline-variant text-on-surface text-sm font-semibold hover:bg-surface-container transition-colors">
+        <span class="material-symbols-outlined text-xl">replay</span>
+        <span>{{ T.replay_rhythm }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Title & Context Framing -->
+  <div class="text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-outline-variant pb-5">
+    <div>
+      <div class="inline-flex items-center gap-2 text-secondary mb-1">
+        <span class="material-symbols-outlined text-base">wb_sunny</span>
+        <span class="text-sm font-semibold text-secondary">{{ T.tea_garden_morning_routine }}</span>
+      </div>
+      <h1 class="font-headline font-bold text-3xl sm:text-4xl text-on-surface tracking-tight">
+        {{ T.game_sequence_title }}
+      </h1>
+    </div>
+    <div class="flex items-center gap-2 bg-surface-container-low px-4 py-2 rounded-full border border-outline-variant self-start md:self-auto">
+      <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+      <span class="text-sm font-medium text-on-surface-variant">{{ T.untimed_pure_peace }}</span>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- Phase Stepper Banner                       -->
+  <!-- ========================================== -->
+  <div class="w-full bg-surface-container-lowest rounded-2xl border border-outline-variant p-5 calm-card-elevation">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <!-- Step 1 (Observation) -->
+      <div class="flex items-center gap-3 w-full md:w-auto" id="step1Indicator">
+        <div class="w-10 h-10 rounded-full bg-secondary-container text-primary flex items-center justify-center font-bold">
+          <span class="material-symbols-outlined text-lg" id="step1Icon">check</span>
+        </div>
+        <div>
+          <p class="text-xs text-on-surface-variant">Step 1</p>
+          <p class="text-xs text-on-surface-variant">{{ T.step_1 }}</p>
+          <p class="text-sm font-bold text-on-surface">{{ T.step_1_observed }}</p>
+        </div>
+      </div>
+
+      <div class="hidden md:block w-8 h-[2px] bg-outline-variant"></div>
+
+      <!-- Step 2 (Your Turn) -->
+      <div class="flex items-center gap-3 bg-[#FAF3E3] border border-[#DFD6BF] px-5 py-3 rounded-xl w-full md:w-auto shadow-sm" id="step2Indicator">
+        <div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-base">
+          2
+        </div>
+        <div>
+          <span class="text-xs font-bold text-tertiary uppercase tracking-wider">Current Step</span>
+          <span class="text-xs font-bold text-tertiary uppercase tracking-wider">{{ T.current_step }}</span>
+          <p class="font-headline font-bold text-base text-on-surface" id="step2Instructions">
+            {{ T.step_2_your_turn }}
+          </p>
+        </div>
+      </div>
+
+      <div class="hidden md:block w-8 h-[2px] bg-outline-variant"></div>
+
+      <!-- Step 3 (Celebration) -->
+      <div class="flex items-center gap-3 opacity-50 w-full md:w-auto" id="step3Indicator">
+        <div class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-bold text-base">
+          3
+        </div>
+        <div>
+          <p class="text-xs text-on-surface-variant">Step 3</p>
+          <p class="text-xs text-on-surface-variant">{{ T.step_3 }}</p>
+          <p class="text-sm font-medium text-on-surface">{{ T.step_3_celebration }}</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Reassuring Message Bar -->
+  <div id="feedbackBanner" class="hidden p-4 rounded-xl text-center font-medium text-base animate-in fade-in"></div>
+
+  <!-- ========================================== -->
+  <!-- Target Sequence Shelf (3 Items to Follow)  -->
+  <!-- ========================================== -->
+  <section class="bg-surface-container-low rounded-2xl border border-outline-variant p-6 space-y-4">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-2 gap-2">
+      <h2 class="font-headline font-bold text-xl text-on-surface flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">filter_list</span>
+        <span>{{ T.rhythm_to_follow }}</span>
+      </h2>
+      <span class="text-sm text-on-surface-variant" id="sequenceStatusText">{{ T.listen_closely_rhythm }}</span>
+    </div>
+
+    <!-- The 3 Sequence Anchors Display -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5" id="targetSequenceContainer">
+      <!-- Generated via JS -->
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- Interactive Tap Section (Your Choices)     -->
+  <!-- ========================================== -->
+  <section class="space-y-4">
+    <h2 class="font-headline font-bold text-xl text-on-surface">
+      {{ T.tap_to_choose_order }}
+    </h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4" id="choicesGrid">
+      <!-- Interactive Choice Buttons generated via JS -->
+    </div>
+  </section>
+
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const SEQUENCE_ITEMS = [
+    {
+      id: 'bell',
+      name: tr('bell', 'Brass Temple Bell'),
+      desc: tr('bell_sub', '(Awakening Chime)'),
+      image: "{% static 'images/stitch/img_601feb6f7e0c.jpg' %}",
+      soundFreq: 880
+    },
+    {
+      id: 'teacup',
+      name: tr('teacup', 'Ceramic Teacup'),
+      desc: tr('teacup_sub', '(Morning Assam Tea)'),
+      image: "{% static 'images/stitch/img_6c2fd3b00ae1.jpg' %}",
+      soundFreq: 659.25
+    },
+    {
+      id: 'marigold',
+      name: tr('marigold_garland', 'Fresh Marigold Garland'),
+      desc: tr('marigold_garland_sub', '(Courtyard Floral Keepsake)'),
+      image: "{% static 'images/stitch/img_b34af9121bc8.jpg' %}",
+      soundFreq: 523.25
+    },
+    {
+      id: 'fan',
+      name: tr('bamboo_fan', 'Handwoven Bamboo Fan'),
+      desc: tr('bamboo_fan_sub', '(Traditional Cane Weave)'),
+      image: "{% static 'images/stitch/img_b8e8ee8c4fd1.jpg' %}",
+      soundFreq: 1046.50
+    }
+  ];
+
+  // 3-item sequence for this round
+  let currentSequence = [SEQUENCE_ITEMS[0], SEQUENCE_ITEMS[1], SEQUENCE_ITEMS[2]];
+  let userPicks = [];
+  let isDemonstrating = false;
+
+  function initSequenceGame() {
+    userPicks = [];
+    isDemonstrating = false;
+    document.getElementById('feedbackBanner').className = 'hidden';
+    renderTargetSequence();
+    renderChoices();
+    // Play initial gentle demo after 500ms
+    setTimeout(playSequenceDemo, 600);
+  }
+
+  function renderTargetSequence() {
+    const container = document.getElementById('targetSequenceContainer');
+    container.innerHTML = '';
+
+    currentSequence.forEach((item, idx) => {
+      const isChosen = userPicks.length > idx;
+      const card = document.createElement('div');
+      card.id = `target-${idx}`;
+      card.className = `relative bg-surface-container-lowest rounded-xl border-2 ${isChosen ? 'border-primary ring-2 ring-primary/20' : 'border-outline-variant'} p-5 flex flex-col items-center text-center shadow-warm-resting transition-all duration-300`;
+      
+      const itemLabel = idx === 0 ? tr('item_1st', '1st Item') : (idx === 1 ? tr('item_2nd', '2nd Item') : tr('item_3rd', '3rd Item'));
+      const statusLabel = isChosen ? tr('selected_check', 'Selected ✓') : (userPicks.length === idx ? tr('next_to_tap', 'Next to tap') : tr('waiting', 'Waiting'));
+
+      card.innerHTML = `
+        <span class="absolute top-3 left-3 ${isChosen ? 'bg-secondary-container text-primary font-bold' : 'bg-surface-container-high text-on-surface-variant font-semibold'} text-xs px-3 py-1 rounded-full border border-outline-variant flex items-center gap-1">
+          <span>${itemLabel}</span>
+        </span>
+        <div class="w-24 h-24 my-2 rounded-xl bg-surface-container overflow-hidden p-1 flex items-center justify-center border border-outline-variant">
+          <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover rounded-lg">
+        </div>
+        <h3 class="font-headline font-bold text-base text-on-surface mt-1">${item.name}</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">${item.desc}</p>
+        <span class="mt-3 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full ${isChosen ? 'bg-secondary-container text-primary' : 'bg-surface-container-high text-on-surface-variant'}">
+          <span class="material-symbols-outlined text-sm">${isChosen ? 'check_circle' : 'schedule'}</span>
+          <span>${statusLabel}</span>
+        </span>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function renderChoices() {
+    const container = document.getElementById('choicesGrid');
+    container.innerHTML = '';
+
+    SEQUENCE_ITEMS.forEach((item) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant rounded-2xl p-4 flex flex-col items-center text-center calm-card-elevation transition-all active:scale-95 group focus:ring-4 focus:ring-primary-container`;
+      
+      btn.innerHTML = `
+        <div class="w-20 h-20 rounded-xl overflow-hidden bg-surface-container mb-3 border border-outline-variant">
+          <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+        </div>
+        <h4 class="font-headline font-bold text-sm text-on-surface">${item.name}</h4>
+        <span class="text-xs text-primary font-semibold mt-2 px-3 py-1 rounded-full bg-secondary-container">
+          ${tr('tap_to_turn', 'Tap to Choose')}
+        </span>
+      `;
+
+      btn.addEventListener('click', () => handleChoiceClick(item, btn));
+      container.appendChild(btn);
+    });
+  }
+
+  function playSequenceDemo() {
+    if (isDemonstrating) return;
+    isDemonstrating = true;
+    document.getElementById('sequenceStatusText').textContent = tr('listen_closely_rhythm', "Listen closely to the gentle chime rhythm...");
+    
+    currentSequence.forEach((item, idx) => {
+      setTimeout(() => {
+        playGentleChime('chime');
+        const card = document.getElementById(`target-${idx}`);
+        if (card) {
+          card.classList.add('honey-glow', 'scale-105');
+          setTimeout(() => {
+            card.classList.remove('honey-glow', 'scale-105');
+          }, 700);
+        }
+        if (idx === currentSequence.length - 1) {
+          setTimeout(() => {
+            isDemonstrating = false;
+            document.getElementById('sequenceStatusText').textContent = tr('your_turn_tap_order', "Your turn! Tap the items below in order.");
+          }, 800);
+        }
+      }, idx * 1000);
+    });
+  }
+
+  function handleChoiceClick(item, btn) {
+    if (isDemonstrating) return;
+
+    const expectedItem = currentSequence[userPicks.length];
+    playGentleChime('tap');
+
+    if (item.id === expectedItem.id) {
+      // Correct pick!
+      userPicks.push(item);
+      playGentleChime('bell');
+      renderTargetSequence();
+
+      if (userPicks.length === currentSequence.length) {
+        // Sequence Complete!
+        handleSequenceComplete();
+      }
+    } else {
+      // Gentle hint mistake
+      playGentleChime('hint');
+      const banner = document.getElementById('feedbackBanner');
+      banner.className = 'p-4 rounded-xl bg-[#FAF3E3] border border-[#DFD6BF] text-[#6E5523] text-center font-medium text-base animate-in fade-in';
+      banner.textContent = tr('sequence_retry_msg', "Take your time! Let's listen to the morning rhythm one more time.");
+      setTimeout(() => {
+        userPicks = [];
+        renderTargetSequence();
+        playSequenceDemo();
+      }, 1500);
+    }
+  }
+
+  function handleSequenceComplete() {
+    playGentleChime('celebration');
+    const banner = document.getElementById('feedbackBanner');
+    banner.className = 'p-4 rounded-xl bg-secondary-container border border-primary text-primary text-center font-bold text-lg animate-in fade-in';
+    banner.textContent = tr('sequence_complete_msg', "Beautiful rhythm! All morning chimes remembered with serenity.");
+
+    document.getElementById('step3Indicator').className = 'flex items-center gap-3 bg-secondary-container text-primary px-4 py-2 rounded-xl font-bold';
+
+    // Save game session to SQLite
+    fetch('/api/save-game/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({
+        game_type: 'sequence',
+        game_title: 'Remember the Sequence: Morning Chimes',
+        score: 95,
+        moves: currentSequence.length,
+        mistakes: 0,
+        pairs_found: currentSequence.length,
+        duration_seconds: 120,
+        stars: 3,
+        notes: "Followed the 3-step chimes rhythm effortlessly."
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      setTimeout(() => {
+        window.location.href = `{% url 'game_completion' %}?game=sequence&session_id=${data.session_id || ''}`;
+      }, 1500);
+    })
+    .catch(err => {
+      setTimeout(() => {
+        window.location.href = "{% url 'game_completion' %}?game=sequence";
+      }, 1500);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initSequenceGame);
+</script>
+{% endblock %}

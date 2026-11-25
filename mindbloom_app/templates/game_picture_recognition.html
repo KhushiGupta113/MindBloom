@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Picture Recognition: Familiar Comforts — MindBloom{% endblock %}
+
+{% block extra_head %}
+<style>
+  .paper-card {
+    background-color: #ffffff;
+    border: 2px solid #c3c8c1;
+    box-shadow: 0 4px 16px -2px rgba(83, 73, 56, 0.05);
+  }
+  .paper-card-selected {
+    background-color: #ffffff;
+    border: 2.5px solid #3b5341;
+    box-shadow: 0 8px 24px rgba(59, 83, 65, 0.15);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-grow w-full max-w-5xl mx-auto px-4 sm:px-8 py-8 flex flex-col gap-6">
+
+  <!-- ========================================== -->
+  <!-- Top Navigation Bar                         -->
+  <!-- ========================================== -->
+  <div class="w-full flex flex-wrap items-center justify-between gap-4">
+    <a href="{% url 'games_library' %}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-container hover:bg-surface-container-high text-primary font-semibold text-sm transition-colors border border-outline-variant">
+      <span class="material-symbols-outlined text-primary text-xl">arrow_back</span>
+      <span>{{ T.back_to_games }}</span>
+    </a>
+
+    <div class="flex items-center gap-3">
+      <button onclick="readQuestionAloud()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-container-low border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface text-sm">
+        <span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">volume_up</span>
+        <span class="font-medium">{{ T.read_question_aloud }}</span>
+      </button>
+
+      <button onclick="nextQuestion()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-container hover:bg-secondary-container text-primary font-semibold text-sm transition-colors border border-outline-variant">
+        <span class="material-symbols-outlined text-lg">replay</span>
+        <span>{{ T.try_another_picture }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Reassuring Step Indicator -->
+  <div class="flex flex-wrap items-center justify-between gap-3 border-b border-outline-variant pb-3">
+    <div class="flex items-center gap-2">
+      <span class="px-3.5 py-1 rounded-full bg-secondary-container text-xs font-bold text-primary">
+        {{ T.calm_focus_game }}
+      </span>
+      <span class="text-sm text-on-surface-variant" id="stepCounterText">
+        Step 1 of 3 • {{ T.take_all_time }}
+        {{ T.step_1_of_3 }} • {{ T.take_all_time }}
+      </span>
+    </div>
+    <div class="flex items-center gap-2 text-on-surface-variant text-sm">
+      <span class="material-symbols-outlined text-secondary text-base">spa</span>
+      <span>{{ T.relaxed_pace }}</span>
+    </div>
+  </div>
+
+  <!-- Question / Prompt Area Card -->
+  <section class="bg-surface-container-lowest rounded-2xl p-6 sm:p-8 border border-outline-variant calm-card-elevation flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+    <div class="flex items-start gap-5 max-w-2xl">
+      <!-- Audio speaker button -->
+      <button onclick="readQuestionAloud()" aria-label="Listen to Prompt Voice" class="flex-shrink-0 w-14 h-14 rounded-full bg-surface-container flex items-center justify-center border border-outline-variant hover:bg-surface-container-high transition-transform active:scale-95 shadow-sm">
+        <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">volume_up</span>
+      </button>
+      <div class="space-y-1">
+        <h1 class="font-headline font-bold text-2xl sm:text-3xl text-on-surface" id="questionTitle">
+          {{ T.q1_title }}
+        </h1>
+        <p class="text-base sm:text-lg text-on-surface-variant" id="questionSubtitle">
+          {{ T.q1_sub }}
+        </p>
+      </div>
+    </div>
+    
+    <div class="hidden md:flex flex-col items-center justify-center px-4 py-3 bg-surface-container-low rounded-xl border border-outline-variant/50">
+      <span class="material-symbols-outlined text-tertiary text-2xl">graphic_eq</span>
+      <span class="text-xs font-bold text-tertiary mt-1">Audio Ready</span>
+      <span class="text-xs font-bold text-tertiary mt-1">{{ T.audio_ready }}</span>
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- Picture Choice Grid (2x2 Grid)             -->
+  <!-- ========================================== -->
+  <section aria-label="Picture Choices" class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8" id="choicesContainer">
+    <!-- Generated dynamically via JS -->
+  </section>
+
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const QUESTIONS = [
+    {
+      title: tr('q1_title', "Can you find the fragrant Jasmine Blossom?"),
+      subtitle: tr('q1_sub', "Look at the four pictures below and tap the blossom whenever you are ready."),
+      choices: [
+        {
+          id: 'teacup',
+          name: tr('teacup', 'Terracotta Teacup'),
+          image: "{% static 'images/stitch/img_28b47bd11b77.jpg' %}",
+          isCorrect: false
+        },
+        {
+          id: 'jasmine',
+          name: tr('jasmine', 'White Star Jasmine'),
+          image: "{% static 'images/stitch/img_6a2c31e896b4.jpg' %}",
+          isCorrect: true
+        },
+        {
+          id: 'basket',
+          name: tr('basket', 'Woven Cane Basket'),
+          image: "{% static 'images/stitch/img_44d64d376a7b.jpg' %}",
+          isCorrect: false
+        },
+        {
+          id: 'kahi',
+          name: tr('kahi', 'Bell Metal Bowl'),
+          image: "{% static 'images/stitch/img_160c63a14e64.jpg' %}",
+          isCorrect: false
+        }
+      ]
+    },
+    {
+      title: tr('q2_title', "Can you find the handcrafted Brass Temple Bell?"),
+      subtitle: tr('q2_sub', "Listen to the morning chime and select the bell that awakens the day."),
+      choices: [
+        {
+          id: 'bell',
+          name: tr('bell', 'Brass Temple Bell'),
+          image: "{% static 'images/stitch/img_601feb6f7e0c.jpg' %}",
+          isCorrect: true
+        },
+        {
+          id: 'orchid',
+          name: tr('orchid', 'Foxtail Orchid'),
+          image: "{% static 'images/stitch/img_d3895554d69e.jpg' %}",
+          isCorrect: false
+        },
+        {
+          id: 'fan',
+          name: tr('bamboo_fan', 'Handwoven Bamboo Fan'),
+          image: "{% static 'images/stitch/img_b8e8ee8c4fd1.jpg' %}",
+          isCorrect: false
+        },
+        {
+          id: 'marigold',
+          name: tr('marigold_garland', 'Fresh Marigold Garland'),
+          image: "{% static 'images/stitch/img_b34af9121bc8.jpg' %}",
+          isCorrect: false
+        }
+      ]
+    },
+    {
+      title: tr('q3_title', "Can you find the Traditional Silk Loom (Taat Xaal)?"),
+      subtitle: tr('q3_sub', "Select the rhythmic weaving loom where golden Muga silk is crafted."),
+      choices: [
+        {
+          id: 'teacup',
+          name: tr('teacup', 'Ceramic Teacup'),
+          image: "{% static 'images/stitch/img_6c2fd3b00ae1.jpg' %}",
+          isCorrect: false
+        },
+        {
+          id: 'loom',
+          name: tr('silk_loom_name', 'Traditional Silk Loom'),
+          image: "{% static 'images/stitch/img_3f33aedd8b33.jpg' %}",
+          isCorrect: true
+        },
+        {
+          id: 'jasmine',
+          name: tr('jasmine', 'Star Jasmine'),
+          image: "{% static 'images/stitch/img_6a2c31e896b4.jpg' %}",
+          isCorrect: false
+        },
+        {
+          id: 'basket',
+          name: tr('basket', 'Woven Cane Basket'),
+          image: "{% static 'images/stitch/img_44d64d376a7b.jpg' %}",
+          isCorrect: false
+        }
+      ]
+    }
+  ];
+
+  let currentQuestionIdx = 0;
+  let correctAnswersCount = 0;
+
+  function renderQuestion(idx) {
+    const q = QUESTIONS[idx];
+    document.getElementById('stepCounterText').textContent = `Step ${idx + 1} of ${QUESTIONS.length} • ${tr('take_all_time', 'Take all the time you desire')}`;
+    document.getElementById('questionTitle').textContent = q.title;
+    document.getElementById('questionSubtitle').textContent = q.subtitle;
+
+    const container = document.getElementById('choicesContainer');
+    container.innerHTML = '';
+
+    q.choices.forEach((choice, cIdx) => {
+      const card = document.createElement('article');
+      card.className = 'paper-card rounded-2xl p-5 sm:p-6 flex flex-col gap-4 cursor-pointer hover:border-primary transition-all group';
+      
+      card.innerHTML = `
+        <div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-surface-container border border-outline-variant/60">
+          <img src="${choice.image}" alt="${choice.name}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+          <div class="absolute top-3 right-3 w-8 h-8 rounded-full bg-surface-bright/90 backdrop-blur-sm border border-outline-variant flex items-center justify-center font-bold text-xs text-on-surface">
+            ${cIdx + 1}
+          </div>
+        </div>
+        <div class="flex items-center justify-between pt-1">
+          <div class="flex items-center gap-3">
+            <span class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center check-circle"></span>
+            <span class="font-headline font-bold text-lg text-on-surface choice-name">${choice.name}</span>
+          </div>
+          <span class="material-symbols-outlined text-outline-variant group-hover:text-primary text-2xl">touch_app</span>
+        </div>
+      `;
+
+      card.addEventListener('click', () => handleChoiceClick(card, choice, q));
+      container.appendChild(card);
+    });
+  }
+
+  function handleChoiceClick(cardEl, choice, q) {
+    playGentleChime('tap');
+
+    if (choice.isCorrect) {
+      playGentleChime('bell');
+      cardEl.className = 'paper-card-selected rounded-2xl p-5 sm:p-6 flex flex-col gap-4 cursor-pointer relative transition-all ring-2 ring-primary';
+      
+      const checkCircle = cardEl.querySelector('.check-circle');
+      if (checkCircle) {
+        checkCircle.className = 'w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center';
+        checkCircle.innerHTML = '<span class="material-symbols-outlined text-sm">check</span>';
+      }
+      const choiceName = cardEl.querySelector('.choice-name');
+      if (choiceName) choiceName.className = 'font-headline font-bold text-lg text-primary';
+
+      // Floating Badge
+      const badge = document.createElement('div');
+      badge.className = 'absolute -top-3.5 left-6 px-4 py-1 rounded-full bg-primary text-on-primary text-xs font-bold flex items-center gap-1.5 shadow-md animate-in fade-in';
+      badge.innerHTML = `<span class="material-symbols-outlined text-base">check_circle</span> <span>${choice.name} — Selected!</span>`;
+      cardEl.appendChild(badge);
+
+      correctAnswersCount++;
+
+      setTimeout(() => {
+        if (currentQuestionIdx < QUESTIONS.length - 1) {
+          currentQuestionIdx++;
+          renderQuestion(currentQuestionIdx);
+        } else {
+          handleRecognitionComplete();
+        }
+      }, 1400);
+
+    } else {
+      playGentleChime('hint');
+      cardEl.classList.add('bg-[#FAF3E3]');
+      setTimeout(() => {
+        cardEl.classList.remove('bg-[#FAF3E3]');
+      }, 800);
+    }
+  }
+
+  function handleRecognitionComplete() {
+    playGentleChime('celebration');
+
+    fetch('/api/save-game/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({
+        game_type: 'picture_recognition',
+        game_title: 'Picture Recognition: Familiar Comforts',
+        score: 100,
+        moves: QUESTIONS.length,
+        mistakes: 0,
+        pairs_found: QUESTIONS.length,
+        duration_seconds: 90,
+        stars: 3,
+        notes: "Identified Jasmine blossom, brass bell, and traditional silk loom with gentle clarity."
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      window.location.href = `{% url 'game_completion' %}?game=picture_recognition&session_id=${data.session_id || ''}`;
+    })
+    .catch(err => {
+      window.location.href = "{% url 'game_completion' %}?game=picture_recognition";
+    });
+  }
+
+  function readQuestionAloud() {
+    const q = QUESTIONS[currentQuestionIdx];
+    speakPageText(q.speakText);
+  }
+
+  function nextQuestion() {
+    currentQuestionIdx = (currentQuestionIdx + 1) % QUESTIONS.length;
+    renderQuestion(currentQuestionIdx);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => renderQuestion(0));
+</script>
+{% endblock %}

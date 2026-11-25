@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Word & Picture Recall: Treasures of Home — MindBloom{% endblock %}
+
+{% block content %}
+<main class="flex-grow w-full max-w-5xl mx-auto px-4 sm:px-8 py-8 flex flex-col gap-6">
+
+  <!-- Navigation Bar -->
+  <div class="w-full flex flex-wrap items-center justify-between gap-4">
+    <a href="{% url 'games_library' %}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-semibold text-base transition-colors border border-outline-variant">
+      <span class="material-symbols-outlined text-primary text-xl">arrow_back</span>
+      <span>{{ T.back_to_games }}</span>
+    </a>
+
+    <div class="flex items-center gap-3">
+      <button onclick="readInstructionsAloud()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface text-sm border border-outline-variant">
+        <span class="material-symbols-outlined text-tertiary">volume_up</span>
+        <span>{{ T.read_aloud }}</span>
+      </button>
+
+      <button onclick="initRecallGame()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-container-lowest border border-outline-variant text-on-surface text-sm font-semibold hover:bg-surface-container">
+        <span class="material-symbols-outlined text-xl">refresh</span>
+        <span>{{ T.restart_recall }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Title & Context -->
+  <div class="border-b border-outline-variant pb-4">
+    <div class="inline-flex items-center gap-2 text-secondary text-sm mb-1">
+      <span class="material-symbols-outlined text-base">auto_stories</span>
+      <span>{{ T.language_familiar_memory }}</span>
+    </div>
+    <h1 class="font-headline font-bold text-3xl sm:text-4xl text-on-surface">
+      {{ T.game_word_recall_title }}
+    </h1>
+    <p class="text-base sm:text-lg text-on-surface-variant mt-1" id="phaseDescription">
+      {{ T.phase_1_sub }}
+    </p>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- PHASE 1: STUDY PHASE                       -->
+  <!-- ========================================== -->
+  <section id="studyPhaseSection" class="space-y-6">
+    <div class="bg-surface-container-low rounded-2xl p-6 border border-outline-variant calm-card-elevation flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-primary text-3xl">visibility</span>
+        <div>
+          <h2 class="font-headline font-bold text-xl text-on-surface">{{ T.observe_prompt }}</h2>
+          <p class="text-sm text-on-surface-variant">{{ T.gentle_flow_sub }}</p>
+        </div>
+      </div>
+      <button onclick="startRecallPhase()" class="min-h-[52px] px-8 py-3 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-bold text-lg flex items-center gap-2 shadow transition-transform active:scale-95">
+        <span>{{ T.ready_to_recall_btn }}</span>
+        <span class="material-symbols-outlined text-xl">arrow_forward</span>
+      </button>
+    </div>
+
+    <!-- 3 Study Items Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="studyCardsGrid">
+      <!-- 1: Silk Loom -->
+      <article class="bg-surface-container-lowest rounded-2xl p-6 border-2 border-primary/40 calm-card-elevation flex flex-col items-center text-center space-y-4">
+        <div class="w-full h-48 rounded-xl overflow-hidden bg-surface-container">
+          <img src="{% static 'images/stitch/img_3f33aedd8b33.jpg' %}" alt="Traditional Silk Loom" class="w-full h-full object-cover">
+        </div>
+        <div>
+          <span class="text-xs font-bold text-tertiary uppercase">1</span>
+          <h3 class="font-headline font-bold text-2xl text-on-surface mt-1">{{ T.silk_loom_name }}</h3>
+          <p class="text-sm text-on-surface-variant">{{ T.silk_loom_sub }}</p>
+        </div>
+      </article>
+
+      <!-- 2: Star Jasmine -->
+      <article class="bg-surface-container-lowest rounded-2xl p-6 border-2 border-primary/40 calm-card-elevation flex flex-col items-center text-center space-y-4">
+        <div class="w-full h-48 rounded-xl overflow-hidden bg-surface-container">
+          <img src="{% static 'images/stitch/img_6a2c31e896b4.jpg' %}" alt="Star Jasmine Blossom" class="w-full h-full object-cover">
+        </div>
+        <div>
+          <span class="text-xs font-bold text-tertiary uppercase">2</span>
+          <h3 class="font-headline font-bold text-2xl text-on-surface mt-1">{{ T.jasmine_flower_name }}</h3>
+          <p class="text-sm text-on-surface-variant">{{ T.jasmine_flower_sub }}</p>
+        </div>
+      </article>
+
+      <!-- 3: Brass Temple Bell -->
+      <article class="bg-surface-container-lowest rounded-2xl p-6 border-2 border-primary/40 calm-card-elevation flex flex-col items-center text-center space-y-4">
+        <div class="w-full h-48 rounded-xl overflow-hidden bg-surface-container">
+          <img src="{% static 'images/stitch/img_601feb6f7e0c.jpg' %}" alt="Brass Temple Bell" class="w-full h-full object-cover">
+        </div>
+        <div>
+          <span class="text-xs font-bold text-tertiary uppercase">3</span>
+          <h3 class="font-headline font-bold text-2xl text-on-surface mt-1">{{ T.bell }}</h3>
+          <p class="text-sm text-on-surface-variant">{{ T.bell_sub }}</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- PHASE 2: RECALL PHASE                      -->
+  <!-- ========================================== -->
+  <section id="recallPhaseSection" class="hidden space-y-6">
+    <div class="bg-surface-container-low rounded-2xl p-6 border border-outline-variant calm-card-elevation flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        <h2 class="font-headline font-bold text-xl text-on-surface" id="recallStatusTitle">
+          {{ T.which_3_observed }}
+        </h2>
+        <p class="text-sm text-on-surface-variant" id="recallStatusSubtitle">
+          {{ T.tap_each_remember }}
+        </p>
+      </div>
+      <div class="px-5 py-2 rounded-full bg-secondary-container text-primary font-bold text-base" id="recalledCounter">
+        0 / 3
+      </div>
+    </div>
+
+    <!-- 6 Choice Cards Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-6" id="recallChoicesGrid">
+      <!-- Generated via JS -->
+    </div>
+  </section>
+
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const STUDY_ITEMS = [
+    { id: 'loom', name: tr('silk_loom_name', 'Traditional Silk Loom'), subtitle: tr('silk_loom_sub', 'Taat Xaal / Weaving Craft'), image: "{% static 'images/stitch/img_3f33aedd8b33.jpg' %}", isTarget: true },
+    { id: 'jasmine', name: tr('jasmine_flower_name', 'Fresh Star Jasmine'), subtitle: tr('jasmine_flower_sub', 'Fragrant Garden Blossom'), image: "{% static 'images/stitch/img_6a2c31e896b4.jpg' %}", isTarget: true },
+    { id: 'bell', name: tr('bell', 'Brass Temple Bell'), subtitle: tr('bell_sub', 'Morning Chime Keepsake'), image: "{% static 'images/stitch/img_601feb6f7e0c.jpg' %}", isTarget: true },
+  ];
+
+  const DISTRACTORS = [
+    { id: 'teacup', name: tr('teacup', 'Ceramic Teacup'), subtitle: tr('teacup_sub', 'Assam Tea'), image: "{% static 'images/stitch/img_6c2fd3b00ae1.jpg' %}", isTarget: false },
+    { id: 'kahi', name: tr('kahi', 'Bell Metal Bowl'), subtitle: tr('kahi_sub', 'Traditional Kahi'), image: "{% static 'images/stitch/img_160c63a14e64.jpg' %}", isTarget: false },
+    { id: 'marigold', name: tr('marigold_garland', 'Fresh Marigold Garland'), subtitle: tr('marigold_garland_sub', 'Courtyard Floral Keepsake'), image: "{% static 'images/stitch/img_b34af9121bc8.jpg' %}", isTarget: false },
+  ];
+
+  let recalledCount = 0;
+
+  function initRecallGame() {
+    recalledCount = 0;
+    document.getElementById('studyPhaseSection').classList.remove('hidden');
+    document.getElementById('recallPhaseSection').classList.add('hidden');
+    document.getElementById('phaseDescription').textContent = tr('phase_1_sub', "Phase 1: Look at these 3 treasures of home. Take your time to observe them.");
+  }
+
+  function startRecallPhase() {
+    playGentleChime('chime');
+    document.getElementById('studyPhaseSection').classList.add('hidden');
+    document.getElementById('recallPhaseSection').classList.remove('hidden');
+    document.getElementById('phaseDescription').textContent = tr('phase_2_sub', "Phase 2: Tap the 3 treasures of home you just observed.");
+    document.getElementById('recalledCounter').textContent = `0 / 3`;
+
+    // Combine and shuffle 6 choices
+    const allChoices = [...STUDY_ITEMS, ...DISTRACTORS].sort(() => Math.random() - 0.5);
+    const grid = document.getElementById('recallChoicesGrid');
+    grid.innerHTML = '';
+
+    allChoices.forEach(item => {
+      const card = document.createElement('article');
+      card.className = 'bg-surface-container-lowest rounded-2xl p-5 border-2 border-outline-variant calm-card-elevation flex flex-col items-center text-center space-y-3 cursor-pointer hover:border-primary transition-all group';
+      
+      card.innerHTML = `
+        <div class="w-full h-40 rounded-xl overflow-hidden bg-surface-container">
+          <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+        </div>
+        <div class="flex-grow">
+          <h3 class="font-headline font-bold text-lg text-on-surface">${item.name}</h3>
+          <p class="text-xs text-on-surface-variant">${item.subtitle}</p>
+        </div>
+        <span class="status-pill text-xs font-bold px-3 py-1 rounded-full bg-surface-container text-on-surface-variant flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">touch_app</span> ${tr('tap_to_turn', 'Tap to Recall')}
+        </span>
+      `;
+
+      card.addEventListener('click', () => handleRecallClick(card, item));
+      grid.appendChild(card);
+    });
+  }
+
+  function handleRecallClick(cardEl, item) {
+    if (cardEl.dataset.selected === 'true') return;
+    playGentleChime('tap');
+
+    if (item.isTarget) {
+      cardEl.dataset.selected = 'true';
+      playGentleChime('bell');
+      cardEl.classList.remove('border-outline-variant');
+      cardEl.classList.add('border-primary', 'ring-2', 'ring-primary/20');
+      
+      const pill = cardEl.querySelector('.status-pill');
+      pill.className = 'status-pill text-xs font-bold px-3 py-1 rounded-full bg-secondary-container text-primary flex items-center gap-1';
+      pill.innerHTML = `<span class="material-symbols-outlined text-sm">check_circle</span> ${tr('recalled_check', 'Recalled ✓')}`;
+
+      recalledCount++;
+      document.getElementById('recalledCounter').textContent = `${recalledCount} / 3`;
+
+      if (recalledCount === 3) {
+        handleRecallComplete();
+      }
+    } else {
+      playGentleChime('hint');
+      cardEl.classList.add('bg-[#FAF3E3]');
+      setTimeout(() => {
+        cardEl.classList.remove('bg-[#FAF3E3]');
+      }, 700);
+    }
+  }
+
+  function handleRecallComplete() {
+    playGentleChime('celebration');
+    document.getElementById('recallStatusTitle').textContent = tr('recall_complete_msg', "Splendid memory! All 3 treasures recalled with warmth.");
+
+    fetch('/api/save-game/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({
+        game_type: 'word_recall',
+        game_title: 'Word & Picture Recall: Treasures of Home',
+        score: 100,
+        moves: 3,
+        mistakes: 0,
+        pairs_found: 3,
+        duration_seconds: 110,
+        stars: 3,
+        notes: "Recalled Traditional Silk Loom, Jasmine blossom, and Brass Bell with serenity."
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      setTimeout(() => {
+        window.location.href = `{% url 'game_completion' %}?game=word_recall&session_id=${data.session_id || ''}`;
+      }, 1500);
+    })
+    .catch(err => {
+      setTimeout(() => {
+        window.location.href = "{% url 'game_completion' %}?game=word_recall";
+      }, 1500);
+    });
+  }
+
+  function readInstructionsAloud() {
+    speakPageText("Word and Picture Recall: Treasures of Home. First observe the three treasures: the Traditional Silk Loom, the Fresh Star Jasmine, and the Brass Temple Bell. When you are ready, tap I am Ready to Recall.");
+  }
+</script>
+{% endblock %}

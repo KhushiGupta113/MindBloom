@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}English Garden Blossoms: A Relaxing Memory Pair — MindBloom{% endblock %}
+
+{% block extra_head %}
+<style>
+  .card-flip {
+    perspective: 1000px;
+    cursor: pointer;
+  }
+  .card-inner {
+    transition: transform 0.4s ease;
+    transform-style: preserve-3d;
+  }
+  .card-flip.is-flipped .card-inner {
+    transform: rotateY(180deg);
+  }
+  .card-front, .card-back {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .card-back {
+    transform: rotateY(180deg);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-8 py-8 space-y-8">
+
+  <!-- Orientation Bar & Breadcrumb -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <a href="{% url 'games_library' %}" class="inline-flex items-center gap-3 text-secondary hover:text-primary transition-colors py-2 px-4 rounded-full bg-surface-container-low border border-outline-variant w-fit text-sm font-semibold">
+      <span class="material-symbols-outlined text-xl">arrow_back</span>
+      <span>{{ T.back_to_games }}</span>
+    </a>
+
+    <!-- Calming Birdsong Audio Strip -->
+    <div class="flex items-center gap-4 bg-surface-container-low border border-outline-variant rounded-full px-5 py-2.5 shadow-sm">
+      <span class="material-symbols-outlined text-secondary text-2xl" id="gardenAudioIcon">nature</span>
+      <span class="text-sm text-on-surface font-medium" id="gardenAudioText">{{ T.soft_meadow_ambience|default:"Soft English Meadow Ambience (Playing gently)" }}</span>
+      <div class="h-4 w-[1px] bg-outline-variant"></div>
+      <button onclick="toggleMeadowAudio()" class="flex items-center gap-1.5 text-primary hover:text-primary-container text-sm font-semibold">
+        <span class="material-symbols-outlined text-xl" id="pauseGardenIcon">pause_circle</span>
+        <span id="pauseGardenText">{{ T.pause|default:"Pause" }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Activity Header -->
+  <div class="max-w-3xl space-y-2">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-secondary-fixed text-on-secondary-fixed text-xs font-bold">
+      <span class="material-symbols-outlined text-base">yard</span>
+      <span>{{ T.botanical_garden }}</span>
+    </div>
+    <h1 class="font-headline font-bold text-3xl sm:text-4xl text-on-surface tracking-tight">
+      {{ T.game_garden_title }}
+    </h1>
+    <p class="text-base sm:text-lg text-on-surface-variant leading-relaxed">
+      {{ T.game_garden_desc }}
+    </p>
+  </div>
+
+  <!-- Layout: Board + Side Reassurance Column -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-12">
+    
+    <!-- Interactive Garden Board (8 Columns) -->
+    <div class="lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 md:p-8 calm-card-elevation space-y-6">
+      
+      <!-- Live Toast Banner -->
+      <div class="px-6 py-4 rounded-xl bg-secondary-fixed border border-secondary text-on-secondary-fixed flex items-center justify-between" id="gardenToast">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-2xl text-primary">sentiment_very_satisfied</span>
+          <span class="text-base font-bold" id="gardenToastMsg">{{ T.garden_welcome_toast }}</span>
+        </div>
+        <span class="text-xs font-bold bg-surface-container-lowest px-3 py-1 rounded-full text-primary border border-outline-variant" id="gardenMatchBadge">
+          {{ T.match }} 0 {{ T.of_four }}
+        </span>
+      </div>
+
+      <!-- 4-column Grid of 8 Blossom Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-5" id="gardenGrid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Side Reassurance Column (4 Columns) -->
+    <div class="lg:col-span-4 flex flex-col gap-6">
+      
+      <!-- Garden Blossoms Found Module -->
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 calm-card-elevation space-y-4">
+        <div class="flex items-center justify-between border-b border-outline-variant pb-3">
+          <h3 class="font-headline font-bold text-lg text-on-surface">{{ T.garden_blossoms_found }}</h3>
+          <span class="material-symbols-outlined text-primary text-xl">filter_vintage</span>
+        </div>
+
+        <div class="space-y-3" id="gardenFlowersList">
+          <div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low" id="flower-rose">
+            <span class="text-sm font-semibold text-on-surface">{{ T.rose_name }}</span>
+            <span class="flower-status text-xs text-on-surface-variant">{{ T.waiting_to_bloom }}</span>
+          </div>
+          <div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low" id="flower-pea">
+            <span class="text-sm font-semibold text-on-surface">{{ T.pea_name }}</span>
+            <span class="flower-status text-xs text-on-surface-variant">{{ T.waiting_to_bloom }}</span>
+          </div>
+          <div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low" id="flower-hydrangea">
+            <span class="text-sm font-semibold text-on-surface">{{ T.hydrangea_name }}</span>
+            <span class="flower-status text-xs text-on-surface-variant">{{ T.waiting_to_bloom }}</span>
+          </div>
+          <div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low" id="flower-lavender">
+            <span class="text-sm font-semibold text-on-surface">{{ T.lavender_name }}</span>
+            <span class="flower-status text-xs text-on-surface-variant">{{ T.waiting_to_bloom }}</span>
+          </div>
+        </div>
+
+        <div class="pt-2 text-center">
+          <p class="text-xs text-on-surface-variant italic">
+            {{ T.each_flower_blossoms|default:"Each flower blossoms softly at your own peaceful pace." }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Daughter Sarah's Gentle Card -->
+      <div class="bg-surface-container-low border border-outline-variant rounded-2xl p-6 calm-card-elevation space-y-3">
+        <div class="flex items-center gap-3">
+          <img src="{% static 'images/stitch/img_a3312d477143.jpg' %}" alt="Sarah and Eleanor" class="w-12 h-12 rounded-full object-cover border-2 border-surface-container-lowest">
+          <div>
+            <h4 class="font-headline font-bold text-base text-on-surface">{{ T.sarah_note_title }}</h4>
+            <span class="text-xs text-on-surface-variant">{{ T.daughter_sarah }}</span>
+          </div>
+        </div>
+        <p class="text-sm text-on-surface-variant italic leading-relaxed">
+          {{ T.sarah_garden_quote }}
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const GARDEN_BLOSSOMS = [
+    {
+      id: 'rose',
+      name: tr('rose_name', 'Antique Tea Rose'),
+      image: "{% static 'images/stitch/img_1f1248216929.jpg' %}"
+    },
+    {
+      id: 'pea',
+      name: tr('pea_name', 'Sweet Pea Blossom'),
+      image: "{% static 'images/stitch/img_b232542349d0.jpg' %}"
+    },
+    {
+      id: 'hydrangea',
+      name: tr('hydrangea_name', 'Blue Hydrangea'),
+      image: "{% static 'images/stitch/img_3acc87ba6b2d.jpg' %}"
+    },
+    {
+      id: 'lavender',
+      name: tr('lavender_name', 'English Lavender'),
+      image: "{% static 'images/stitch/img_787a4b16912e.jpg' %}"
+    }
+  ];
+
+  let gardenDeck = [];
+  let gardenFlipped = [];
+  let gardenMatched = 0;
+  let gardenTurns = 0;
+
+  function initGardenGame() {
+    gardenMatched = 0;
+    gardenTurns = 0;
+    gardenFlipped = [];
+
+    gardenDeck = [];
+    GARDEN_BLOSSOMS.forEach(b => {
+      gardenDeck.push({ ...b, uid: b.id + '_1' });
+      gardenDeck.push({ ...b, uid: b.id + '_2' });
+    });
+    gardenDeck.sort(() => Math.random() - 0.5);
+
+    const grid = document.getElementById('gardenGrid');
+    grid.innerHTML = '';
+
+    gardenDeck.forEach((b, idx) => {
+      const card = document.createElement('div');
+      card.className = 'card-flip aspect-[4/5]';
+      card.dataset.id = b.id;
+
+      card.innerHTML = `
+        <div class="card-inner relative w-full h-full">
+          <!-- Card Front: Face Down -->
+          <button type="button" class="card-front absolute inset-0 w-full h-full rounded-2xl border border-outline-variant bg-surface-container-low hover:bg-surface-container p-3 flex flex-col items-center justify-center calm-card-elevation transition-all group">
+            <div class="w-full h-full rounded-xl border border-dashed border-outline flex flex-col items-center justify-center p-3 bg-surface-container-lowest">
+              <div class="w-12 h-12 rounded-full bg-secondary-fixed/50 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-2xl text-primary" style="font-variation-settings: 'FILL' 1;">local_florist</span>
+              </div>
+              <span class="text-xs font-semibold text-on-surface-variant">${tr('tap_to_turn', 'Tap to Turn')}</span>
+            </div>
+          </button>
+
+          <!-- Card Back: Flower Image -->
+          <div class="card-back absolute inset-0 w-full h-full rounded-2xl border-2 border-outline-variant bg-surface-container-lowest p-2.5 flex flex-col items-center justify-between calm-card-elevation">
+            <div class="w-full h-3/4 rounded-xl overflow-hidden bg-surface-container">
+              <img src="${b.image}" alt="${b.name}" class="w-full h-full object-cover">
+            </div>
+            <div class="text-center py-1">
+              <span class="font-headline font-bold text-xs text-primary">${b.name}</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      card.addEventListener('click', () => handleGardenCardClick(card, b));
+      grid.appendChild(card);
+    });
+  }
+
+  function handleGardenCardClick(cardEl, b) {
+    if (cardEl.classList.contains('is-flipped') || cardEl.classList.contains('is-matched')) return;
+    if (gardenFlipped.length >= 2) return;
+
+    playGentleChime('tap');
+    cardEl.classList.add('is-flipped');
+    gardenFlipped.push({ el: cardEl, data: b });
+
+    if (gardenFlipped.length === 2) {
+      gardenTurns++;
+      checkGardenMatch();
+    }
+  }
+
+  function checkGardenMatch() {
+    const [c1, c2] = gardenFlipped;
+    if (c1.data.id === c2.data.id) {
+      playGentleChime('bell');
+      c1.el.classList.add('is-matched');
+      c2.el.classList.add('is-matched');
+
+      [c1.el, c2.el].forEach(c => {
+        const back = c.querySelector('.card-back');
+        back.classList.remove('border-outline-variant');
+        back.classList.add('border-primary', 'bg-secondary-fixed/30');
+      });
+
+      gardenMatched++;
+      document.getElementById('gardenMatchBadge').textContent = `${tr('match', 'Match')} ${gardenMatched} ${tr('of_four', 'of 4')}`;
+      document.getElementById('gardenToastMsg').textContent = `${tr('garden_found_toast', 'Lovely choice! You found the')} ${c1.data.name}.`;
+
+      // Update side flower indicator
+      const flowerRow = document.getElementById(`flower-${c1.data.id}`);
+      if (flowerRow) {
+        flowerRow.className = 'flex items-center justify-between p-3 rounded-xl bg-secondary-container text-primary font-bold';
+        flowerRow.querySelector('.flower-status').textContent = tr('bloomed_in_garden', 'Bloomed in Garden ✓');
+      }
+
+      gardenFlipped = [];
+
+      if (gardenMatched === 4) {
+        setTimeout(handleGardenComplete, 1200);
+      }
+    } else {
+      setTimeout(() => {
+        c1.el.classList.remove('is-flipped');
+        c2.el.classList.remove('is-flipped');
+        gardenFlipped = [];
+      }, 1000);
+    }
+  }
+
+  function handleGardenComplete() {
+    playGentleChime('celebration');
+
+    fetch('/api/save-game/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({
+        game_type: 'gentle_garden',
+        game_title: 'English Garden Blossoms: Relaxing Memory Pair',
+        score: 100,
+        moves: gardenTurns,
+        mistakes: Math.max(0, gardenTurns - 4),
+        pairs_found: 4,
+        duration_seconds: 130,
+        stars: 3,
+        notes: "Bloomed all 4 English garden flowers with quiet joy."
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      window.location.href = `{% url 'game_completion' %}?game=gentle_garden&session_id=${data.session_id || ''}`;
+    })
+    .catch(err => {
+      window.location.href = "{% url 'game_completion' %}?game=gentle_garden";
+    });
+  }
+
+  let meadowPaused = false;
+  function toggleMeadowAudio() {
+    meadowPaused = !meadowPaused;
+    const icon = document.getElementById('pauseGardenIcon');
+    const txt = document.getElementById('pauseGardenText');
+    if (meadowPaused) {
+      icon.textContent = 'play_circle';
+      txt.textContent = 'Play';
+    } else {
+      playGentleChime('bell');
+      icon.textContent = 'pause_circle';
+      txt.textContent = 'Pause';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', initGardenGame);
+</script>
+{% endblock %}
